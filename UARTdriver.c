@@ -1,10 +1,10 @@
-#include <avr/io.h>
-
+#include "UARTdriver.h"
+#include "avr/io.h"
 
 #define F_CPU 4915200UL // crystal oscillator
 
 
-int uart0_init (unisgned int baud) {
+int uart0_init (unsigned int baud) {
 
     int ubrr = F_CPU / (16 * baud) - 1;
 
@@ -17,7 +17,7 @@ int uart0_init (unisgned int baud) {
                                                       // UCSZ0 is number of databits (uses 2 bits, 3 gives 11 translating to 8 databits)
     UCSRB0 = (1 << TXEN0) | (1 << RXEN0);
 
-    return 0 // Success
+    return 0; // Success
 }
 
 
@@ -36,6 +36,5 @@ int uart0_tx (char byte) {
 
     UDR0 = byte; //stores data into buffer
 
-
-    return 0 // Success
+    return 0; // Success
 }
