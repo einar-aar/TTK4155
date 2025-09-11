@@ -1,5 +1,8 @@
 #include <avr/io.h>
+<<<<<<< HEAD
 #include <UART_driver.h>
+=======
+>>>>>>> 0800f27ac69368cd55f1a14734e082e1b305596a
 
 
 // ATmega162 cpu frequency
@@ -19,4 +22,7 @@ int main(void) {
     }
     return 0;
 }
+<<<<<<< HEAD
 
+=======
+>>>>>>> 0800f27ac69368cd55f1a14734e082e1b305596a
