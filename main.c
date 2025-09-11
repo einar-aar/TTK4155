@@ -1,5 +1,14 @@
+<<<<<<< HEAD
 #include "UARTdriver.h"
 #include "avr/io.h"
+=======
+#include <avr/io.h>
+<<<<<<< HEAD
+#include <UART_driver.h>
+=======
+>>>>>>> 0800f27ac69368cd55f1a14734e082e1b305596a
+
+>>>>>>> 966fc6ea92d4f504325058f8df097edd100b8a74
 
 // ATmega162 cpu frequency
 #define F_CPU 4915200UL
@@ -24,6 +33,15 @@ int main(void) {
         printk("%c", res);
 
     }
+<<<<<<< HEAD
 
     return 0;
 }
+=======
+    return 0;
+}
+<<<<<<< HEAD
+
+=======
+>>>>>>> 0800f27ac69368cd55f1a14734e082e1b305596a
+>>>>>>> 966fc6ea92d4f504325058f8df097edd100b8a74
