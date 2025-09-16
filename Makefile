@@ -1,5 +1,7 @@
 # List all source files to be compiled; separate with space
-SOURCE_FILES := main.c UARTdriver.c sram_test.c
+SOURCE_FILES := main.c drivers/UARTdriver.c sram_test.c drivers/BUSdriver.c drivers/XMEM.c
+
+VPATH := . drivers #
 
 # Set this flag to "yes" (no quotes) to use JTAG; otherwise ISP (SPI) is used
 PROGRAM_WITH_JTAG := yes
@@ -15,9 +17,15 @@ TARGET_CPU := atmega162
 TARGET_DEVICE := m162
 
 CC := avr-gcc
-CFLAGS := -O -std=c11 -mmcu=$(TARGET_CPU) -ggdb
+CFLAGS  := -O -std=c11 -mmcu=$(TARGET_CPU) -DF_CPU=4915200UL -ggdb -Wall
+LDFLAGS := -mmcu=$(TARGET_CPU)
 
-OBJECT_FILES = $(SOURCE_FILES:%.c=$(BUILD_DIR)/%.o)
+
+# Hent bare filnavnene
+OBJECT_NAMES := $(notdir $(SOURCE_FILES:.c=.o))
+
+# Lag full path til .o-filene i build/
+OBJECT_FILES := $(addprefix build/, $(OBJECT_NAMES))
 
 .DEFAULT_GOAL := $(BUILD_DIR)/main.hex
 
