@@ -3,6 +3,7 @@
         "delay.h": "c",
         "io.h": "c",
         "iom162.h": "c",
-        "uartdriver.h": "c"
+        "uartdriver.h": "c",
+        "stdint.h": "c"
     }
 }

@@ -1,5 +1,5 @@
 # List all source files to be compiled; separate with space
-SOURCE_FILES := main.c drivers/UARTdriver.c sram_test.c drivers/BUSdriver.c drivers/XMEM.c
+SOURCE_FILES := main.c drivers/UARTdriver.c sram_test.c drivers/BUSdriver.c drivers/XMEM.c drivers/ADCdriver.c
 
 VPATH := . drivers #
 

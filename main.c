@@ -3,7 +3,7 @@
 #include "drivers/UARTdriver.h"
 #include "drivers/BUSdriver.h"
 #include "drivers/XMEM.h"
-
+#include "drivers/ADCdriver.h"
 
 // ATmega162 cpu frequency
 #define F_CPU 4915200UL
@@ -60,21 +60,27 @@ int external_memory_init(void) {
 
     }*/
 
+    // initialize ADC
+    if (init_clock() != 0) {
+
+        printf("Failed to initialize ADC");
+    }
+
     // Initialize external memory
     if (external_memory_init() != 0) {
 
         printf("Failed to initialize external memory");
     }
 
-    // SRAM_test();
+    SRAM_test();
 
-    uint16_t message_sent = 0x51;
+    uint16_t message_sent = 79;
 
-    BUS_send(0x183E, message_sent);
+    BUS_send(0x0200, message_sent);
 
-    uint8_t message_received = BUS_read(0x183E);
+    uint8_t message_received = BUS_read(0x0200);
 
-    printf("Message sent: %d\nMessage received: %d\n", message_sent, message_received);
+    printf("Message sent: %d\n\rMessage received: %d\n\r", message_sent, message_received);
 
     return 0;
 }
