@@ -76,9 +76,9 @@ int external_memory_init(void) {
 
     uint16_t message_sent = 79;
 
-    BUS_send(0x0200, message_sent);
+    SRAM_send(0x0200, message_sent);
 
-    uint8_t message_received = BUS_read(0x0200);
+    uint8_t message_received = SRAM_read(0x0200);
 
     printf("Message sent: %d\n\rMessage received: %d\n\r", message_sent, message_received);
 

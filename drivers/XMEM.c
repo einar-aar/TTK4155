@@ -11,3 +11,20 @@ int external_memory_init(void) {
 
     return 0; // Success
 }
+
+
+void SRAM_send(uint16_t address, uint8_t data) {
+
+    /*uint16_t mask = 0b0000111111111111;
+    uint16_t new_address = bitmask(address, mask);*/
+
+    SRAM[address] = data;
+}
+
+uint8_t SRAM_read(uint16_t address) {
+
+    /*uint16_t mask = 0b0000111111111111;
+    uint16_t new_address = bitmask(address, mask);*/
+
+    return SRAM[address];
+}
