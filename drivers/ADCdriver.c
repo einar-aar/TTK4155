@@ -42,11 +42,33 @@ uint8_t* ADC_read(void) {
 
     _delay_ms(50);
 
+
+
     // Put CH0, 1, 2 and 3 in array result
     for (int i = 0; i < 4; i++) {
 
         result[i] = *ADC;
+
+        if (i == 0 || i == 1) { // scaled joystick to be in range (0-255)
+
+            if (result[i] >= 71) {
+
+                result[i] = (uint8_t)((result[i] - 71)*1.46); 
+
+            } else {
+
+                result[i] = 0;
+            }
+            
+            if (result[i] > 255) {
+
+                result[i] = 255;
+            }
+        }
     }
 
     return result;
 }
+
+
+// Convert from 
