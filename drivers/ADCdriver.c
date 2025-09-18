@@ -33,10 +33,20 @@ int init_clock(void) {
 
 
 // Read function
-uint8_t ADC_read(uint16_t address) {
+uint8_t* ADC_read(void) {
 
-    /*uint16_t mask = 0b0000111111111111;
-    uint16_t new_address = bitmask(address, mask);*/
+    uint8_t* result = malloc(sizeof(uint8_t)*4);
+    memset(result, 0, sizeof(uint8_t)*4);
 
-    return ADC[address];
+    *ADC = 0;
+
+    _delay_ms(50);
+
+    // Put CH0, 1, 2 and 3 in array result
+    for (int i = 0; i < 4; i++) {
+
+        result[i] = *ADC;
+    }
+
+    return result;
 }

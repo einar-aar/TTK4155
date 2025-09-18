@@ -74,14 +74,36 @@ int external_memory_init(void) {
 
     SRAM_test();
 
-    uint16_t message_sent = 79;
+    /*ADC[0]=0x04;
+    uint8_t value=ADC[0];
+    printf("ADC-verdi: %02X\n\n\r", value);
+
+    _delay_ms(50);*/
+
+    uint8_t* ADC_values = malloc(sizeof(uint8_t)*4);
+    memset(ADC_values, 0, sizeof(uint8_t)*4);
+
+    while (1) {
+        
+        ADC_values = ADC_read();
+        printf("ch0: %d, ch1: %d, ch2: %d, ch3: %d\n\r", ADC_values[0], ADC_values[1], ADC_values[2], ADC_values[3]);
+        free(ADC_values);
+    }
+
+    /*
+    uint16_t message_sent = 80;
 
     SRAM_send(0x0200, message_sent);
 
-    uint8_t message_received = SRAM_read(0x0200);
+    uint8_t SRAM_message_received = SRAM_read(0x0200);
 
-    printf("Message sent: %d\n\rMessage received: %d\n\r", message_sent, message_received);
-
+    uint8_t ADC_message_received;
+    while (1) {
+        ADC_message_received = ADC_read(0x0100);
+        printf("%d\n\r", ADC_message_received);
+    }
+    printf("Message sent: %d\n\rMessage received: %d\n\rADC message received: %d\n\r", message_sent, SRAM_message_received, ADC_message_received);
+    */
     return 0;
 }
 

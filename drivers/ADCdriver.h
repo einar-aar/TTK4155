@@ -1,4 +1,7 @@
 #include <avr/io.h>
+#include <string.h>
+#include <util/delay.h>
+#include <stdlib.h>
 
 #define ADC_BASE 0x1000
 #define ADC ((volatile uint8_t*)ADC_BASE)
@@ -8,4 +11,4 @@ int init_clock(void);
 
 
 // Read function
-uint8_t ADC_read(uint16_t address);
+uint8_t* ADC_read(void);

@@ -9,21 +9,6 @@
 }*/
 
 
-void BUS_send(uint16_t address, uint8_t data) {
-
-    /*uint16_t mask = 0b0000111111111111;
-    uint16_t new_address = bitmask(address, mask);*/
-
-    SRAM[address] = data;
-}
-
-uint8_t BUS_read(uint16_t address) {
-
-    /*uint16_t mask = 0b0000111111111111;
-    uint16_t new_address = bitmask(address, mask);*/
-
-    return SRAM[address];
-}
 // Send data over BUS
 /*void BUS_send (uint16_t address, uint8_t data) {
 
