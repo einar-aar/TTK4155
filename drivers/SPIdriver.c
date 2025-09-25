@@ -50,3 +50,9 @@ void SPI_slaveselect (char slave[]) {
         PORTD &= ~(1 << SS_IO_MCU);
     }
 }
+
+// Release slave
+void SPI_release_slave (void) {
+
+    PORTD |= (1 << SS_OLED) | (1 << SS_IO_MCU);
+}

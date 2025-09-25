@@ -4,6 +4,7 @@
         "io.h": "c",
         "iom162.h": "c",
         "uartdriver.h": "c",
-        "stdint.h": "c"
+        "stdint.h": "c",
+        "spidriver.h": "c"
     }
 }

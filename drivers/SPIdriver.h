@@ -11,3 +11,5 @@ void SPI_transmit (char data);
 char SPI_receive (void);
 
 void SPI_slaveselect (char slave[]);
+
+void SPI_release_slave (void);
