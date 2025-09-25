@@ -6,7 +6,8 @@ void SPI_init (void) {
     // Activate MOSI and Serial clock and set Slave select as output
     // MISO is set as input when MISO-bit is 0
     // Set pin PD2 as D/!C, pin PD3 as Slave select for I/O MCU and pin PD4 as Slave select for OLED
-    DDR_SPI = (1 << DD_MOSI) | (1 << DD_SCK) | (1 << DD_SS) | (1 << D_notC) | (1 << SS_IO_MCU) | (1 << SS_OLED);
+    DDR_SPI |= (1 << DD_MOSI) | (1 << DD_SCK) | (1 << DD_SS); 
+    DDRD |= (1 << D_notC) | (1 << SS_IO_MCU) | (1 << SS_OLED);
 
     // Activate Atmega162 as master, activate SPI, regulate SPI clock frequency to f_osc / 16
     SPCR = (1 << MSTR) | (1 << SPE) | (1 << SPR0);
@@ -17,13 +18,15 @@ void SPI_init (void) {
 }
 
 // Transmit over SPI
-void SPI_transmit (char data) {
+char SPI_transmit (char data) {
 
     // Fill data register
     SPDR = data;
 
     // Wait until data is transmitted
     while (!((1 << SPIF) & SPSR));
+
+    return SPDR;
 }
 
 // Receive over SPI

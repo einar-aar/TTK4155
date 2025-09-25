@@ -52,18 +52,30 @@ void OLED_init (void) {
 // Go to line
 void OLED_goto_line (uint8_t page) {
 
-    // Mask to make sure we are operating with 0-7
+    // Mask to make sure we are defining page with 3 bits, since we have 64 pixels height / 8 pixels per page = 8 pages
     page &= 0b00000111;
 
-    OLED_transmit(0b00100010, true);
-
-    OLED_transmit(page, false);
+    // 5 msb is saying we want to get a page, 3 lsb define what page
+    OLED_transmit(0b10110000 | page, true);
 }
 
 // Go to column
 void OLED_goto_column (uint8_t column) {
 
-    OLED_transmit(0b00100001, true);
+    // Mask to make sure we are defining page with 7 bits, since we have 128 pixel wide screen
+    column &= 0b01111111;
 
-    OLED_transmit(column, false);
+    // 4 msb is saying we want to set address, 4 lsb define what address
+    // 0000 msb == set lower column start address
+    OLED_transmit(0b00000000 | (column & 0b00001111), true);
+    // 0001 msb == set higher column start address
+    OLED_transmit(0b00010000 | (column >> 4), true);
 }
+
+// Go to spesific address
+void OLED_goto_address (uint8_t page, uint8_t column) {
+
+    OLED_goto_line(page);
+    OLED_goto_column(column);
+}
+
