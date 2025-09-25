@@ -33,42 +33,78 @@ int init_clock(void) {
 
 
 // Read function
-uint8_t* ADC_read(void) {
+int* ADC_read(void) {
 
-    uint8_t* result = malloc(sizeof(uint8_t)*4);
+    int* result = malloc(sizeof(uint8_t)*4);
     memset(result, 0, sizeof(uint8_t)*4);
 
     *ADC = 0;
 
     _delay_ms(50);
 
+    const int joystick_x_center = 158; //center, max and min value for joystick x
+    const int joystick_x_min_val= 71;
+    const int joystick_x_max_val = 240;
+
+    const int joystick_y_center= 158; //center, max and min value for joystick y
+    const int joystick_y_min_val= 0;
+    const int joystick_y_max_val = 243;
+
+    const int touchpad_center = 157; //center, max and min value for touchpad 
+    const int touchpad_min_val= 0;
+    const int touchpad_max_val = 255;
+
+
 
 
     // Put CH0, 1, 2 and 3 in array result
     for (int i = 0; i < 4; i++) {
 
-        result[i] = *ADC;
+         int original_value = *ADC;
+         int scaled = 0;
 
-        if (i == 0 || i == 1) { // scaled joystick to be in range (0-255)
-
-            if (result[i] >= 71) {
-
-                result[i] = (uint8_t)((result[i] - 71)*1.46); 
-
-            } else {
-
-                result[i] = 0;
+         if (i == 1) {//x axis joystick
+            if (original_value < joystick_x_center) {
+                
+                scaled = (int) (((float)((original_value-joystick_x_center)*100)/(joystick_x_min_val-joystick_x_center)));
             }
-            
-            if (result[i] > 255) {
-
-                result[i] = 255;
+            else {
+                scaled = (int) (((float)(original_value-joystick_x_center)/(joystick_x_max_val-joystick_x_center))*-100);
             }
-        }
-    }
+         }
+
+         else if (i == 0) { //y_axis joystick
+            if (original_value < joystick_y_center) {
+                
+                scaled = (int) (((float)(original_value-joystick_y_center)/(joystick_y_min_val-joystick_y_center))*100/55*100);
+            }
+            else {
+                scaled = (int) (((float)(original_value-joystick_y_center)/(joystick_y_max_val-joystick_y_center))*-100);
+            }
+         }
+         else { //touchpad x and y axis
+            if (original_value < touchpad_center) {
+                
+                scaled = (int) (((float)(original_value-touchpad_center)/(touchpad_min_val-touchpad_center))*100);
+            }
+            else {
+                scaled = (int) (((float)(original_value-touchpad_center)/(touchpad_max_val-touchpad_center))*-100);
+            }
+         }
+          
+
+        
+
+        // limiting from [-100, 100]
+        if (scaled > 100) scaled = 100;
+        if (scaled < -100) scaled = -100;
+
+        result[i]= scaled;
+
+    } 
 
     return result;
 }
 
 
-// Convert from 
+// Convert from 256 bit to 

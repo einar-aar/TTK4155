@@ -80,13 +80,13 @@ int external_memory_init(void) {
 
     _delay_ms(50);*/
 
-    uint8_t* ADC_values = malloc(sizeof(uint8_t)*4);
-    memset(ADC_values, 0, sizeof(uint8_t)*4);
+    int* ADC_values = malloc(sizeof(int)*4);
+    memset(ADC_values, 0, sizeof(int)*4);
 
     while (1) {
         
         ADC_values = ADC_read();
-        printf("ch0: %d, ch1: %d, ch2: %d, ch3: %d\n\r", ADC_values[0], ADC_values[1], ADC_values[2], ADC_values[3]);
+        printf("Joystick_x: %d, joystick_y: %d, touchpad_x: %d, touchpad_y: %d\n\r", ADC_values[1], ADC_values[0], ADC_values[2], ADC_values[3]);
         free(ADC_values);
     }
 

@@ -11,4 +11,4 @@ int init_clock(void);
 
 
 // Read function
-uint8_t* ADC_read(void);
+int* ADC_read(void);
