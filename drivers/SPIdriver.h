@@ -21,3 +21,5 @@ char SPI_receive (void);
 void SPI_slaveselect (int slave);
 
 void SPI_release_slave (void);
+
+void oled_print_char(char c);

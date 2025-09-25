@@ -7,6 +7,7 @@
 #include "drivers/SPIdriver.h"
 #include "drivers/OLEDdriver.h"
 #include "drivers/IO_MCUdriver.h"
+#include "drivers/font5x7.h"
 
 // ATmega162 cpu frequency
 #define F_CPU 4915200UL
@@ -104,7 +105,7 @@ int external_memory_init(void) {
 
             if ((i % 2) != 0) {
 
-                OLED_transmit(255, false);
+                OLED_transmit(0, false);
 
             } else {
 
@@ -112,6 +113,9 @@ int external_memory_init(void) {
             }
         }
     }
+    // OLED_draw_char(2,20, '!');
+
+    OLED_goto_address(2, 20);
 
     /*
     uint16_t message_sent = 80;

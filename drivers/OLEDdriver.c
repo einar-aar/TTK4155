@@ -1,5 +1,6 @@
 #include "OLEDdriver.h"
 #include "SPIdriver.h"
+#include "font5x7.h"
 
 
 // Transmit data or command
@@ -21,6 +22,7 @@ void OLED_transmit (char data, bool command) {
 
     SPI_release_slave();
 }
+
 
 // Initialize OLED
 void OLED_init (void) {
@@ -79,3 +81,25 @@ void OLED_goto_address (uint8_t page, uint8_t column) {
     OLED_goto_column(column);
 }
 
+
+
+//using ASCII 32-127 fonr (5x7)
+void OLED_draw_char(uint8_t page, uint8_t column, char c) {
+    if ( c<32 || c>127) {
+        c='?';
+    }
+    
+    // creating a ptr to the 5 columns that make up the byte
+    const uint8_t *bitmap = font5x7[c-32];
+
+    // setting position for char
+    OLED_goto_address(page,column);
+
+
+    for ( int i =0; i<5; i++) {
+        OLED_transmit(bitmap[i], false);
+        OLED_goto_column(column + 1);
+    }
+
+
+}
