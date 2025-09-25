@@ -93,6 +93,26 @@ int external_memory_init(void) {
         free(ADC_values);
     }*/
 
+    SPI_init();
+    OLED_init();
+
+    for (int i = 0; i < 8; i++) {
+
+        for (int j = 0; j < 128; j++) {
+
+            OLED_goto_address(i, j);
+
+            if ((i % 2) != 0) {
+
+                OLED_transmit(255, false);
+
+            } else {
+
+                OLED_transmit(0, false);
+            }
+        }
+    }
+
     /*
     uint16_t message_sent = 80;
 

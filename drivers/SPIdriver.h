@@ -14,7 +14,7 @@
 
 void SPI_init (void);
 
-void SPI_transmit (char data);
+char SPI_transmit (char data);
 
 char SPI_receive (void);
 
