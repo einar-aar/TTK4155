@@ -55,8 +55,11 @@ void OLED_init (void) {
 void OLED_goto_line (uint8_t page) {
 
     // Mask to make sure we are defining page with 3 bits, since we have 64 pixels height / 8 pixels per page = 8 pages
+    // Mask to make sure we are defining page with 3 bits, since we have 64 pixels height / 8 pixels per page = 8 pages
     page &= 0b00000111;
 
+    // 5 msb is saying we want to get a page, 3 lsb define what page
+    OLED_transmit(0b10110000 | page, true);
     // 5 msb is saying we want to get a page, 3 lsb define what page
     OLED_transmit(0b10110000 | page, true);
 }

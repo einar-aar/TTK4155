@@ -98,6 +98,18 @@ int external_memory_init(void) {
     OLED_init();
 
     for (int i = 0; i < 8; i++) {
+        
+        for (int j = 0; j < 128; j++) {
+
+            OLED_goto_address(i, j);
+            OLED_transmit(255, false);
+        }
+    }
+
+    SPI_init();
+    OLED_init();
+
+    for (int i = 0; i < 8; i++) {
 
         for (int j = 0; j < 128; j++) {
 
