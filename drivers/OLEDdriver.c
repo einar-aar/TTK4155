@@ -1,9 +1,31 @@
-#include <OLEDdriver.h>
-#include <SPIdriver.h>
+#include "OLEDdriver.h"
+#include "SPIdriver.h"
 
+
+// Transmit data or command
+void OLED_transmit (char data, bool command) {
+
+    // If we want to send command, D/!C line needs to be low, else high
+    if (!command) {
+
+        PORTD |= (1 << D_notC);
+
+    } else {
+
+        PORTD &= ~(1 << D_notC);
+    }
+
+    SPI_slaveselect(OLED);
+
+    SPI_transmit(data);
+
+    SPI_release_slave();
+}
+
+// Initialize OLED
 void OLED_init (void) {
 
-    OLED_transmit(0xae, command = true); // display off
+    OLED_transmit(0xae, true); // display off
     OLED_transmit(0xa1, true); // Segment remap
     OLED_transmit(0xda, true); // Common pads hardware: alternative
     OLED_transmit(0x12, true);
@@ -25,26 +47,6 @@ void OLED_init (void) {
     OLED_transmit(0xa4, true); // out follows RAM content
     OLED_transmit(0xa6, true); // set normal display
     OLED_transmit(0xaf, true); // display on
-}
-
-// Transmit data or command
-void OLED_transmit (char data, bool command) {
-
-    // If we want to send command, D/!C line needs to be low, else high
-    if (!command) {
-
-        PORTD |= (1 << D_notC);
-
-    } else {
-
-        PORTD &= ~(1 << D_notC);
-    }
-
-    SPI_slaveselect("OLED");
-
-    SPI_transmit(data);
-
-    SPI_release_slave();
 }
 
 // Go to line

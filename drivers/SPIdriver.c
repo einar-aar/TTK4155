@@ -1,4 +1,4 @@
-#include <SPIdriver.h>
+#include "SPIdriver.h"
 
 // Initialize SPI
 void SPI_init (void) {
@@ -9,10 +9,10 @@ void SPI_init (void) {
     DDR_SPI = (1 << DD_MOSI) | (1 << DD_SCK) | (1 << DD_SS) | (1 << D_notC) | (1 << SS_IO_MCU) | (1 << SS_OLED);
 
     // Activate Atmega162 as master, activate SPI, regulate SPI clock frequency to f_osc / 16
-    SPCR = (1 << MSTR) | (1 << SPE) | (1 << SPR0):
+    SPCR = (1 << MSTR) | (1 << SPE) | (1 << SPR0);
 
-    // Set Slave select logical low by default 
-    PORTD |= (1 << DD_SS) | ;
+    // Set Slave select logical low, physical high by default 
+    PORTD |= (1 << SS_OLED) | (1 << SS_IO_MCU);
 
 }
 
@@ -36,15 +36,15 @@ char SPI_receive (void) {
 }
 
 // Slave select function
-void SPI_slaveselect (char slave[]) {
+void SPI_slaveselect (int slave) {
 
     // Set Slave select logical high to select OLED
-    if (slave == "OLED") {
+    if (slave == OLED) {
         
         PORTD |= (1 << SS_IO_MCU);
         PORTD &= ~(1 << SS_OLED);
 
-    } else if (slave == "IO_MCU") {
+    } else if (slave == IO_MCU) {
         
         PORTD |= (1 << SS_OLED);
         PORTD &= ~(1 << SS_IO_MCU);

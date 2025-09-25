@@ -4,6 +4,9 @@
 #include "drivers/BUSdriver.h"
 #include "drivers/XMEM.h"
 #include "drivers/ADCdriver.h"
+#include "drivers/SPIdriver.h"
+#include "drivers/OLEDdriver.h"
+#include "drivers/IO_MCUdriver.h"
 
 // ATmega162 cpu frequency
 #define F_CPU 4915200UL
