@@ -3,6 +3,9 @@
 #include "fonts.h"
 #include <avr/pgmspace.h>
 #include <string.h>
+#include "fonts.h"
+#include <avr/pgmspace.h>
+#include <string.h>
 
 
 // Transmit data or command
@@ -29,6 +32,44 @@ void OLED_transmit (char data, bool command) {
 // Initialize OLED
 void OLED_init (void) {
 
+    OLED_transmit(0xAE, true);      // Display OFF
+
+    // — Anbefalt grunnoppsett —
+    OLED_transmit(0x20, true);      // Set Memory Addressing Mode
+    OLED_transmit(0x00, true);      //   0x00 = Horizontal addressing mode
+
+    OLED_transmit(0x21, true);      // Set Column Address
+    OLED_transmit(0x00, true);      //   start = 0
+    OLED_transmit(0x7F, true);      //   end   = 127
+
+    OLED_transmit(0x22, true);      // Set Page Address
+    OLED_transmit(0x00, true);      //   start = 0
+    OLED_transmit(0x07, true);      //   end   = 7
+
+    OLED_transmit(0xA0, true);      // Segment remap: normal (SEG0->col0)
+    OLED_transmit(0xC0, true);      // COM scan direction: normal (COM0->row0)
+    OLED_transmit(0xD3, true);      // Display offset
+    OLED_transmit(0x00, true);      //   0
+    OLED_transmit(0x40, true);      // Set display start line = 0
+
+    OLED_transmit(0xA6, true);      // Normal display (ikke invers)
+    OLED_transmit(0xA4, true);      // Output følger RAM (ikke "entire display ON")
+
+    // (Valgfritt: timing/pins avhengig av panel)
+    // OLED_transmit(0xD5, true); OLED_transmit(0x80, true); // clock div/osc
+    // OLED_transmit(0xA8, true); OLED_transmit(0x3F, true); // multiplex 1/64
+    // OLED_transmit(0xDA, true); OLED_transmit(0x12, true); // COM pins cfg
+
+    // Clear én gang (nå peker den horisontalt og auto-inkrementerer kolonne)
+    for (uint8_t page = 0; page < 8; page++) {
+        OLED_transmit(0x22, true); OLED_transmit(page, true); OLED_transmit(page, true);
+        OLED_transmit(0x21, true); OLED_transmit(0, true);    OLED_transmit(127, true);
+        for (uint8_t col = 0; col < 128; col++) {
+            OLED_transmit(0x00, false);
+        }
+    }
+
+    OLED_transmit(0xAF, true); 
     OLED_transmit(0xAE, true);      // Display OFF
 
     // — Anbefalt grunnoppsett —

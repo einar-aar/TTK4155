@@ -9,6 +9,7 @@
 #include "drivers/IO_MCUdriver.h"
 #include "drivers/font5x7.h"
 #include "drivers/fonts.h"
+#include "drivers/fonts.h"
 
 // ATmega162 cpu frequency
 #define F_CPU 4915200UL
@@ -17,6 +18,7 @@
 
 #include <util/delay.h>
 #include "sram_test.h"
+#include <avr/pgmspace.h>
 #include <avr/pgmspace.h>
 
 
@@ -102,6 +104,9 @@ int external_memory_init(void) {
     
     // Write all pixels
     /*
+    
+    // Write all pixels
+    /*
     for (int i = 0; i < 8; i++) {
         
         for (int j = 0; j < 128; j++) {
@@ -113,7 +118,11 @@ int external_memory_init(void) {
     */
     /*
     // Clear all pixels
+    */
+    /*
+    // Clear all pixels
     for (int i = 0; i < 8; i++) {
+        
         
         for (int j = 0; j < 128; j++) {
 
