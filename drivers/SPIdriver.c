@@ -9,31 +9,25 @@ void SPI_init (void) {
     DDR_SPI |= (1 << DD_MOSI) | (1 << DD_SCK) | (1 << DD_SS); 
     DDRD |= (1 << D_notC) | (1 << SS_IO_MCU) | (1 << SS_OLED);
 
+    // Activate input with internal pullup on joystick button read pin
+    DDRB  &= ~(1 << Joystick_btn); 
+    PORTB |= (1 << Joystick_btn);
+
     // Activate Atmega162 as master, activate SPI, regulate SPI clock frequency to f_osc / 16
     SPCR = (1 << MSTR) | (1 << SPE) | (1 << SPR0);
 
     // Set Slave select logical low, physical high by default 
     PORTD |= (1 << SS_OLED) | (1 << SS_IO_MCU);
-
 }
 
-// Transmit over SPI
-char SPI_transmit (char data) {
+// Transmit or receive over SPI
+char SPI_transfer (char data) {
 
     // Fill data register
     SPDR = data;
 
     // Wait until data is transmitted
     while (!((1 << SPIF) & SPSR));
-
-    return SPDR;
-}
-
-// Receive over SPI
-char SPI_receive (void) {
-
-    // Wait for data
-    while(!((1 << SPIF) & SPSR));
 
     return SPDR;
 }

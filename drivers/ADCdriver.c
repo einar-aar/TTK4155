@@ -1,5 +1,5 @@
 #include "ADCdriver.h"
-
+#include "SPIdriver.h"
 
 // Initialize clock
 int init_clock(void) {
@@ -33,10 +33,12 @@ int init_clock(void) {
 
 
 // Read function
-int* ADC_read(void) {
+int* ADC_read_joystick_and_pad(void) {
 
     int* result = malloc(sizeof(uint8_t)*4);
     memset(result, 0, sizeof(uint8_t)*4);
+
+    SPI_slaveselect(OLED);
 
     *ADC = 0;
 
@@ -100,10 +102,41 @@ int* ADC_read(void) {
         if (scaled < -100) scaled = -100;
 
         result[i]= -scaled;
-    } 
+    }
+
+    SPI_release_slave();
 
     return result;
 }
 
+// read IO module
+void ADC_read_IO_module(uint8_t right_buttons[6], uint8_t left_buttons[7], uint8_t navigation_buttons[5]) {
 
-// Convert from 256 bit to 
+    uint8_t right, left, navigation;
+
+    SPI_slaveselect(IO_MCU);
+
+    SPI_transfer(0x04);
+    _delay_us(40);
+
+    right = SPI_transfer(0x00);
+    _delay_us(2);
+
+    left = SPI_transfer(0x00);
+    _delay_us(2);
+
+    navigation = SPI_transfer(0x00);
+
+    SPI_release_slave();
+
+    for (int i = 0; i < 6; i++) right_buttons[i] = (right >> i) & 1;
+    for (int i = 0; i < 7; i++) left_buttons[i] = (left >> i) & 1;
+    for (int i = 0; i < 5; i++) navigation_buttons[i] = (navigation >> i) & 1;
+}
+
+
+// Read joystick button
+uint8_t read_joystick_button(void) {
+
+    return (PINB & (1 << Joystick_btn) ? 1 : 0);
+}

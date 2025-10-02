@@ -152,9 +152,18 @@ int external_memory_init(void) {
     int* ADC_values = malloc(sizeof(int)*4);
     memset(ADC_values, 0, sizeof(int)*4);
 
+    uint8_t right_buttons[6], left_buttons[7], navigation_buttons[5];
+
     while (1) {
         
-        ADC_values = ADC_read();
+        ADC_read_IO_module(right_buttons, left_buttons, navigation_buttons);
+
+        if (right_buttons[4] == 1) {
+
+            OLED_clear_page(main_menu_position);
+        }
+
+        ADC_values = ADC_read_joystick_and_pad();
         
         if (ADC_values[0] >= 50) {
 
@@ -166,6 +175,7 @@ int external_memory_init(void) {
             OLED_main_menu_navigate('d');
             _delay_ms(200);
         }
+
 
         free(ADC_values);
     }

@@ -8,13 +8,14 @@
 #define D_notC PD2
 #define SS_IO_MCU PD3
 #define SS_OLED PD4
+#define Joystick_btn PB3
 
 #define OLED 1
 #define IO_MCU 2
 
 void SPI_init (void);
 
-char SPI_transmit (char data);
+char SPI_transfer (char data);
 
 char SPI_receive (void);
 

@@ -1,5 +1,6 @@
 #include "OLEDdriver.h"
 #include "SPIdriver.h"
+#include "ADCdriver.h"
 #include "fonts.h"
 #include <avr/pgmspace.h>
 #include <string.h>
@@ -24,7 +25,7 @@ void OLED_transmit (char data, bool command) {
 
     SPI_slaveselect(OLED);
 
-    SPI_transmit(data);
+    SPI_transfer(data);
 
     SPI_release_slave();
 }
@@ -52,7 +53,6 @@ void OLED_init (void) {
 // Go to line
 void OLED_goto_line (uint8_t page) {
 
-    // Mask to make sure we are defining page with 3 bits, since we have 64 pixels height / 8 pixels per page = 8 pages
     // Mask to make sure we are defining page with 3 bits, since we have 64 pixels height / 8 pixels per page = 8 pages
     page &= 0b00000111;
 
@@ -271,3 +271,4 @@ void OLED_main_menu_navigate (char direction) {
         make_arrow(main_menu_position);
     }
 }
+
