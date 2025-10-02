@@ -106,6 +106,7 @@ void OLED_draw_char(uint8_t page, uint8_t column, char c, char font) {
 
     if ( c<32 || c>127) {
 
+
         c='?';
     }
 
@@ -210,13 +211,13 @@ void OLED_main_menu (void) {
 
     OLED_clear_screen();
 
-    OLED_draw_string(0, 3, "Main menu", 'm');
-    OLED_draw_string(2, 3, "Start game", 's');
-    OLED_draw_string(3, 3, "Highscore", 's');
-    OLED_draw_string(4, 3, "Options", 's');
-    OLED_draw_string(5, 3, "Placeholder", 's');
+    OLED_draw_string(0, 0, "Main menu", 'm');
+    OLED_draw_string(2, 8, "Start game", 's');
+    OLED_draw_string(3, 8, "Highscore", 's');
+    OLED_draw_string(4, 8, "Options", 's');
+    OLED_draw_string(5, 8, "Placeholder", 's');
 
-    OLED_draw_string(7, 3, "Credits: EAA, TMS, RF", 's');
+    OLED_draw_string(7, 0, "Credits: EAA, TMS, RF", 's');
 
     main_menu_position = 2;
 
