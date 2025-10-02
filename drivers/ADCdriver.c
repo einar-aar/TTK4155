@@ -56,9 +56,6 @@ int* ADC_read_joystick_and_pad(void) {
     const int touchpad_min_val= 0;
     const int touchpad_max_val = 255;
 
-
-
-
     // Put CH0, 1, 2 and 3 in array result
     for (int i = 0; i < 4; i++) {
 

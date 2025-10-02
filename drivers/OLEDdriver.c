@@ -4,9 +4,7 @@
 #include "fonts.h"
 #include <avr/pgmspace.h>
 #include <string.h>
-#include "fonts.h"
-#include <avr/pgmspace.h>
-#include <string.h>
+
 
 volatile int main_menu_position = 0;
 
