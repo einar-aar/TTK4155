@@ -106,7 +106,6 @@ void OLED_draw_char(uint8_t page, uint8_t column, char c, char font) {
 
     if ( c<32 || c>127) {
 
-
         c='?';
     }
 
