@@ -8,6 +8,7 @@
 #include <string.h>
 
 volatile int main_menu_position = 0;
+volatile int main_menu_position = 0;
 
 // Transmit data or command
 void OLED_transmit (char data, bool command) {
@@ -101,10 +102,20 @@ void OLED_clear_screen (void) {
     }
 }
 
+// Clear whole screen
+void OLED_clear_screen (void) {
+
+    for (int i = 0; i < 8; i++) {
+
+        OLED_clear_page(i);
+    }
+}
+
 //using ASCII 32-127 fonr (5x7)
 void OLED_draw_char(uint8_t page, uint8_t column, char c, char font) {
 
     if ( c<32 || c>127) {
+
 
         c='?';
     }
