@@ -1,6 +1,8 @@
 #include "OLEDdriver.h"
 #include "SPIdriver.h"
-#include "font5x7.h"
+#include "fonts.h"
+#include <avr/pgmspace.h>
+#include <string.h>
 
 
 // Transmit data or command
@@ -27,28 +29,44 @@ void OLED_transmit (char data, bool command) {
 // Initialize OLED
 void OLED_init (void) {
 
-    OLED_transmit(0xae, true); // display off
-    OLED_transmit(0xa1, true); // Segment remap
-    OLED_transmit(0xda, true); // Common pads hardware: alternative
-    OLED_transmit(0x12, true);
-    OLED_transmit(0xc8, true); // Common output scan direction com63-com0
-    OLED_transmit(0xa8, true); // multiplex ratio mode 63
-    OLED_transmit(0x3f, true);
-    OLED_transmit(0xd5, true); // display divide ratio
-    OLED_transmit(0x80, true);
-    OLED_transmit(0x81, true); // constrast control
-    OLED_transmit(0x50, true);
-    OLED_transmit(0xd9, true); // set pre-change period
-    OLED_transmit(0x21, true);
-    OLED_transmit(0x20, true); // set memory addressing mode
-    OLED_transmit(0x02, true);
-    OLED_transmit(0xdb, true); // vcom deselect level mode
-    OLED_transmit(0x30, true);
-    OLED_transmit(0xad, true); // master conf
-    OLED_transmit(0x00, true);
-    OLED_transmit(0xa4, true); // out follows RAM content
-    OLED_transmit(0xa6, true); // set normal display
-    OLED_transmit(0xaf, true); // display on
+    OLED_transmit(0xAE, true);      // Display OFF
+
+    // — Anbefalt grunnoppsett —
+    OLED_transmit(0x20, true);      // Set Memory Addressing Mode
+    OLED_transmit(0x00, true);      //   0x00 = Horizontal addressing mode
+
+    OLED_transmit(0x21, true);      // Set Column Address
+    OLED_transmit(0x00, true);      //   start = 0
+    OLED_transmit(0x7F, true);      //   end   = 127
+
+    OLED_transmit(0x22, true);      // Set Page Address
+    OLED_transmit(0x00, true);      //   start = 0
+    OLED_transmit(0x07, true);      //   end   = 7
+
+    OLED_transmit(0xA0, true);      // Segment remap: normal (SEG0->col0)
+    OLED_transmit(0xC0, true);      // COM scan direction: normal (COM0->row0)
+    OLED_transmit(0xD3, true);      // Display offset
+    OLED_transmit(0x00, true);      //   0
+    OLED_transmit(0x40, true);      // Set display start line = 0
+
+    OLED_transmit(0xA6, true);      // Normal display (ikke invers)
+    OLED_transmit(0xA4, true);      // Output følger RAM (ikke "entire display ON")
+
+    // (Valgfritt: timing/pins avhengig av panel)
+    // OLED_transmit(0xD5, true); OLED_transmit(0x80, true); // clock div/osc
+    // OLED_transmit(0xA8, true); OLED_transmit(0x3F, true); // multiplex 1/64
+    // OLED_transmit(0xDA, true); OLED_transmit(0x12, true); // COM pins cfg
+
+    // Clear én gang (nå peker den horisontalt og auto-inkrementerer kolonne)
+    for (uint8_t page = 0; page < 8; page++) {
+        OLED_transmit(0x22, true); OLED_transmit(page, true); OLED_transmit(page, true);
+        OLED_transmit(0x21, true); OLED_transmit(0, true);    OLED_transmit(127, true);
+        for (uint8_t col = 0; col < 128; col++) {
+            OLED_transmit(0x00, false);
+        }
+    }
+
+    OLED_transmit(0xAF, true); 
 }
 
 // Go to line
@@ -88,21 +106,32 @@ void OLED_goto_address (uint8_t page, uint8_t column) {
 
 //using ASCII 32-127 fonr (5x7)
 void OLED_draw_char(uint8_t page, uint8_t column, char c) {
+
     if ( c<32 || c>127) {
         c='?';
     }
-    
-    // creating a ptr to the 5 columns that make up the byte
-    const uint8_t *bitmap = font5x7[c-32];
 
     // setting position for char
     OLED_goto_address(page,column);
 
+    OLED_transmit(0, false);
 
-    for ( int i =0; i<5; i++) {
-        OLED_transmit(bitmap[i], false);
-        OLED_goto_column(column + 1);
+    for ( int i = 0; i < 5; i++) { // writing each column in the char to the display
+
+        uint8_t byte = pgm_read_byte(&font5[c - 32][i]);
+
+        OLED_goto_address(page, column + i + 1);
+        OLED_transmit(byte, false);
     }
 
+    OLED_transmit(0x00, false); // adding a free column after the char
+}
 
+void OLED_draw_string(uint8_t page, uint8_t column, char s[]) {
+
+
+    for (int i = 0; i < strlen(s); i++) {
+
+        OLED_draw_char(page, column + i*6, s[i]);
+    }
 }

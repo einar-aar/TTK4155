@@ -5,6 +5,7 @@
         "iom162.h": "c",
         "uartdriver.h": "c",
         "stdint.h": "c",
-        "spidriver.h": "c"
+        "spidriver.h": "c",
+        "pgmspace.h": "c"
     }
 }

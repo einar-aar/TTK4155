@@ -8,6 +8,7 @@
 #include "drivers/OLEDdriver.h"
 #include "drivers/IO_MCUdriver.h"
 #include "drivers/font5x7.h"
+#include "drivers/fonts.h"
 
 // ATmega162 cpu frequency
 #define F_CPU 4915200UL
@@ -16,6 +17,7 @@
 
 #include <util/delay.h>
 #include "sram_test.h"
+#include <avr/pgmspace.h>
 
 
 int main(void) {
@@ -97,6 +99,9 @@ int external_memory_init(void) {
     SPI_init();
     OLED_init();
 
+    
+    // Write all pixels
+    /*
     for (int i = 0; i < 8; i++) {
         
         for (int j = 0; j < 128; j++) {
@@ -105,29 +110,39 @@ int external_memory_init(void) {
             OLED_transmit(255, false);
         }
     }
-
-    SPI_init();
-    OLED_init();
-
+    */
+    /*
+    // Clear all pixels
     for (int i = 0; i < 8; i++) {
-
+        
         for (int j = 0; j < 128; j++) {
 
             OLED_goto_address(i, j);
-
-            if ((i % 2) != 0) {
-
-                OLED_transmit(0, false);
-
-            } else {
-
-                OLED_transmit(0, false);
-            }
+            OLED_transmit(0, false);
         }
-    }
-    // OLED_draw_char(2,20, '!');
+    }*/
 
-    OLED_goto_address(2, 20);
+    /*
+    OLED_draw_char(0, 20, 'H');
+    OLED_draw_char(0, 26, 'E');
+    OLED_draw_char(0, 32, 'I');*/
+
+    //OLED_goto_address(5, 20);
+    //OLED_transmit(255, false);
+
+    /*
+    for (int i = 0; i < 8; i++) {
+        
+        for (int j = 0; j < 128; j++) {
+
+            OLED_goto_address(i, j);
+            OLED_transmit(255, false);
+        }
+    }*/
+
+    OLED_draw_string(2, 20, "HEI");
+
+    //OLED_goto_address(2, 20);
 
     /*
     uint16_t message_sent = 80;
