@@ -7,6 +7,7 @@
 #include <avr/pgmspace.h>
 #include <string.h>
 
+volatile int main_menu_position = 0;
 
 // Transmit data or command
 void OLED_transmit (char data, bool command) {
@@ -153,10 +154,20 @@ void OLED_clear_page (uint8_t page) {
     }
 }
 
+// Clear whole screen
+void OLED_clear_screen (void) {
+
+    for (int i = 0; i < 8; i++) {
+
+        OLED_clear_page(i);
+    }
+}
+
 //using ASCII 32-127 fonr (5x7)
 void OLED_draw_char(uint8_t page, uint8_t column, char c, char font) {
 
     if ( c<32 || c>127) {
+
         c='?';
     }
 
@@ -208,5 +219,114 @@ void OLED_draw_string(uint8_t page, uint8_t column, char s[], char font) {
 
             OLED_draw_char(page + 1, column + i*(column_number + 1), s[i], font);
         }
+    }
+}
+
+
+// Main menu navigation helper
+void make_arrow (uint8_t page) {
+
+    OLED_goto_address(page, 115);
+    OLED_transmit(0b00011000, false);
+
+    OLED_goto_address(page, 116);
+    OLED_transmit(0b00111100, false);
+
+    OLED_goto_address(page, 117);
+    OLED_transmit(0b00111100, false);
+
+    OLED_goto_address(page, 118);
+    OLED_transmit(0b01111110, false);
+
+    OLED_goto_address(page, 119);
+    OLED_transmit(0b01111110, false);
+
+    OLED_goto_address(page, 120);
+    OLED_transmit(0b11111111, false);
+}
+
+void clear_arrow (uint8_t page) {
+
+    OLED_goto_address(page, 115);
+    OLED_transmit(0, false);
+
+    OLED_goto_address(page, 116);
+    OLED_transmit(0, false);
+
+    OLED_goto_address(page, 117);
+    OLED_transmit(0, false);
+
+    OLED_goto_address(page, 118);
+    OLED_transmit(0, false);
+
+    OLED_goto_address(page, 119);
+    OLED_transmit(0, false);
+
+    OLED_goto_address(page, 120);
+    OLED_transmit(0, false);
+}
+
+
+// Initialize main menu
+void OLED_main_menu (void) {
+
+    OLED_clear_screen();
+
+    OLED_draw_string(-1, 3, "Main menu", 'm');
+    OLED_draw_string(1, 3, "Start game", 's');
+    OLED_draw_string(2, 3, "Highscore", 's');
+    OLED_draw_string(3, 3, "Options", 's');
+    OLED_draw_string(4, 3, "Placeholder", 's');
+
+    main_menu_position = 2;
+
+    make_arrow(main_menu_position);
+}
+
+
+// Navigate main menu
+void OLED_main_menu_navigate (char direction) {
+
+    if (main_menu_position == 2) {
+
+        if (direction == 'u') {
+
+            clear_arrow(main_menu_position);
+            main_menu_position = 5;
+            make_arrow(main_menu_position);
+
+        } else if (direction == 'd') {
+
+            clear_arrow(main_menu_position);
+            main_menu_position++;
+            make_arrow(main_menu_position);
+        }
+
+    } else if (main_menu_position == 5) {
+
+        if (direction == 'u') {
+
+            clear_arrow(main_menu_position);
+            main_menu_position--;
+            make_arrow(main_menu_position);
+
+        } else if (direction == 'd') {
+
+            clear_arrow(main_menu_position);
+            main_menu_position = 2;
+            make_arrow(main_menu_position);
+        }
+
+    } else if (direction == 'd') {
+
+        clear_arrow(main_menu_position);
+        main_menu_position++;
+        make_arrow(main_menu_position);
+    
+    } else if (direction == 'u') {
+
+        clear_arrow(main_menu_position);
+        main_menu_position--;
+        make_arrow(main_menu_position);
     }
 }
