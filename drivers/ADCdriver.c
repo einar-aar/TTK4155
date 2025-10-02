@@ -99,8 +99,7 @@ int* ADC_read(void) {
         if (scaled > 100) scaled = 100;
         if (scaled < -100) scaled = -100;
 
-        result[i]= scaled;
-
+        result[i]= -scaled;
     } 
 
     return result;

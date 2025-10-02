@@ -100,10 +100,6 @@ int external_memory_init(void) {
 
     SPI_init();
     OLED_init();
-
-    
-    // Write all pixels
-    /*
     
     // Write all pixels
     /*
@@ -149,7 +145,30 @@ int external_memory_init(void) {
         }
     }*/
 
-    OLED_draw_string(0, 0, "Hei, jeg heter Anders og liker fisk", 'm');
+    // OLED_draw_string(0, 0, "Hei, jeg heter Anders og liker fisk", 'm');
+
+    OLED_main_menu();
+
+    int* ADC_values = malloc(sizeof(int)*4);
+    memset(ADC_values, 0, sizeof(int)*4);
+
+    while (1) {
+        
+        ADC_values = ADC_read();
+        
+        if (ADC_values[0] >= 50) {
+
+            OLED_main_menu_navigate('u');
+            _delay_ms(200);
+            
+        } else if (ADC_values[0] <= -50) {
+
+            OLED_main_menu_navigate('d');
+            _delay_ms(200);
+        }
+
+        free(ADC_values);
+    }
 
     //OLED_goto_address(2, 20);
 

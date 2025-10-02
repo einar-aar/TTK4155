@@ -7,6 +7,7 @@
 #include <avr/pgmspace.h>
 #include <string.h>
 
+volatile int main_menu_position = 0;
 
 // Transmit data or command
 void OLED_transmit (char data, bool command) {
@@ -34,71 +35,9 @@ void OLED_init (void) {
 
     OLED_transmit(0xAE, true);      // Display OFF
 
-    // — Anbefalt grunnoppsett —
-    OLED_transmit(0x20, true);      // Set Memory Addressing Mode
-    OLED_transmit(0x00, true);      //   0x00 = Horizontal addressing mode
+    OLED_transmit(0xA1, true);      // Segment remap: normal (SEG0->col0)
+    OLED_transmit(0xC8, true);      // COM scan direction: normal (COM0->row0)
 
-    OLED_transmit(0x21, true);      // Set Column Address
-    OLED_transmit(0x00, true);      //   start = 0
-    OLED_transmit(0x7F, true);      //   end   = 127
-
-    OLED_transmit(0x22, true);      // Set Page Address
-    OLED_transmit(0x00, true);      //   start = 0
-    OLED_transmit(0x07, true);      //   end   = 7
-
-    OLED_transmit(0xA0, true);      // Segment remap: normal (SEG0->col0)
-    OLED_transmit(0xC0, true);      // COM scan direction: normal (COM0->row0)
-    OLED_transmit(0xD3, true);      // Display offset
-    OLED_transmit(0x00, true);      //   0
-    OLED_transmit(0x40, true);      // Set display start line = 0
-
-    OLED_transmit(0xA6, true);      // Normal display (ikke invers)
-    OLED_transmit(0xA4, true);      // Output følger RAM (ikke "entire display ON")
-
-    // (Valgfritt: timing/pins avhengig av panel)
-    // OLED_transmit(0xD5, true); OLED_transmit(0x80, true); // clock div/osc
-    // OLED_transmit(0xA8, true); OLED_transmit(0x3F, true); // multiplex 1/64
-    // OLED_transmit(0xDA, true); OLED_transmit(0x12, true); // COM pins cfg
-
-    // Clear én gang (nå peker den horisontalt og auto-inkrementerer kolonne)
-    for (uint8_t page = 0; page < 8; page++) {
-        OLED_transmit(0x22, true); OLED_transmit(page, true); OLED_transmit(page, true);
-        OLED_transmit(0x21, true); OLED_transmit(0, true);    OLED_transmit(127, true);
-        for (uint8_t col = 0; col < 128; col++) {
-            OLED_transmit(0x00, false);
-        }
-    }
-
-    OLED_transmit(0xAF, true); 
-    OLED_transmit(0xAE, true);      // Display OFF
-
-    // — Anbefalt grunnoppsett —
-    OLED_transmit(0x20, true);      // Set Memory Addressing Mode
-    OLED_transmit(0x00, true);      //   0x00 = Horizontal addressing mode
-
-    OLED_transmit(0x21, true);      // Set Column Address
-    OLED_transmit(0x00, true);      //   start = 0
-    OLED_transmit(0x7F, true);      //   end   = 127
-
-    OLED_transmit(0x22, true);      // Set Page Address
-    OLED_transmit(0x00, true);      //   start = 0
-    OLED_transmit(0x07, true);      //   end   = 7
-
-    OLED_transmit(0xA0, true);      // Segment remap: normal (SEG0->col0)
-    OLED_transmit(0xC0, true);      // COM scan direction: normal (COM0->row0)
-    OLED_transmit(0xD3, true);      // Display offset
-    OLED_transmit(0x00, true);      //   0
-    OLED_transmit(0x40, true);      // Set display start line = 0
-
-    OLED_transmit(0xA6, true);      // Normal display (ikke invers)
-    OLED_transmit(0xA4, true);      // Output følger RAM (ikke "entire display ON")
-
-    // (Valgfritt: timing/pins avhengig av panel)
-    // OLED_transmit(0xD5, true); OLED_transmit(0x80, true); // clock div/osc
-    // OLED_transmit(0xA8, true); OLED_transmit(0x3F, true); // multiplex 1/64
-    // OLED_transmit(0xDA, true); OLED_transmit(0x12, true); // COM pins cfg
-
-    // Clear én gang (nå peker den horisontalt og auto-inkrementerer kolonne)
     for (uint8_t page = 0; page < 8; page++) {
         OLED_transmit(0x22, true); OLED_transmit(page, true); OLED_transmit(page, true);
         OLED_transmit(0x21, true); OLED_transmit(0, true);    OLED_transmit(127, true);
@@ -153,10 +92,20 @@ void OLED_clear_page (uint8_t page) {
     }
 }
 
+// Clear whole screen
+void OLED_clear_screen (void) {
+
+    for (int i = 0; i < 8; i++) {
+
+        OLED_clear_page(i);
+    }
+}
+
 //using ASCII 32-127 fonr (5x7)
 void OLED_draw_char(uint8_t page, uint8_t column, char c, char font) {
 
     if ( c<32 || c>127) {
+
         c='?';
     }
 
@@ -206,7 +155,118 @@ void OLED_draw_string(uint8_t page, uint8_t column, char s[], char font) {
 
         } else {
 
-            OLED_draw_char(page + 1, column + i*(column_number + 1), s[i], font);
+            OLED_draw_char(page, column + i*(column_number + 1), s[i], font);
         }
+    }
+}
+
+
+// Main menu navigation helper
+void make_arrow (uint8_t page) {
+
+    OLED_goto_address(page, 115);
+    OLED_transmit(0b00011000, false);
+
+    OLED_goto_address(page, 116);
+    OLED_transmit(0b00111100, false);
+
+    OLED_goto_address(page, 117);
+    OLED_transmit(0b00111100, false);
+
+    OLED_goto_address(page, 118);
+    OLED_transmit(0b01111110, false);
+
+    OLED_goto_address(page, 119);
+    OLED_transmit(0b01111110, false);
+
+    OLED_goto_address(page, 120);
+    OLED_transmit(0b11111111, false);
+}
+
+void clear_arrow (uint8_t page) {
+
+    OLED_goto_address(page, 115);
+    OLED_transmit(0, false);
+
+    OLED_goto_address(page, 116);
+    OLED_transmit(0, false);
+
+    OLED_goto_address(page, 117);
+    OLED_transmit(0, false);
+
+    OLED_goto_address(page, 118);
+    OLED_transmit(0, false);
+
+    OLED_goto_address(page, 119);
+    OLED_transmit(0, false);
+
+    OLED_goto_address(page, 120);
+    OLED_transmit(0, false);
+}
+
+
+// Initialize main menu
+void OLED_main_menu (void) {
+
+    OLED_clear_screen();
+
+    OLED_draw_string(0, 3, "Main menu", 'm');
+    OLED_draw_string(2, 3, "Start game", 's');
+    OLED_draw_string(3, 3, "Highscore", 's');
+    OLED_draw_string(4, 3, "Options", 's');
+    OLED_draw_string(5, 3, "Placeholder", 's');
+
+    OLED_draw_string(7, 3, "Credits: EAA, TMS, RF", 's');
+
+    main_menu_position = 2;
+
+    make_arrow(main_menu_position);
+}
+
+
+// Navigate main menu
+void OLED_main_menu_navigate (char direction) {
+
+    if (main_menu_position == 2) {
+
+        if (direction == 'u') {
+
+            clear_arrow(main_menu_position);
+            main_menu_position = 5;
+            make_arrow(main_menu_position);
+
+        } else if (direction == 'd') {
+
+            clear_arrow(main_menu_position);
+            main_menu_position++;
+            make_arrow(main_menu_position);
+        }
+
+    } else if (main_menu_position == 5) {
+
+        if (direction == 'u') {
+
+            clear_arrow(main_menu_position);
+            main_menu_position--;
+            make_arrow(main_menu_position);
+
+        } else if (direction == 'd') {
+
+            clear_arrow(main_menu_position);
+            main_menu_position = 2;
+            make_arrow(main_menu_position);
+        }
+
+    } else if (direction == 'd') {
+
+        clear_arrow(main_menu_position);
+        main_menu_position++;
+        make_arrow(main_menu_position);
+    
+    } else if (direction == 'u') {
+
+        clear_arrow(main_menu_position);
+        main_menu_position--;
+        make_arrow(main_menu_position);
     }
 }
