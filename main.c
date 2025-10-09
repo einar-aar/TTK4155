@@ -7,8 +7,8 @@
 #include "drivers/SPIdriver.h"
 #include "drivers/OLEDdriver.h"
 #include "drivers/fonts.h"
-#include "drivers/fonts.h"
-#include "drivers/CANdriver.h"
+#include "drivers/CANcontdriver.h"
+#include "drivers/CANcomdriver.h"
 
 // ATmega162 cpu frequency
 #define F_CPU 4915200UL
@@ -98,7 +98,29 @@ int external_memory_init(void) {
     }*/
 
     SPI_init();
-    OLED_init();
+    // OLED_init();
+    CAN_controller_init();
+
+    uint8_t stat = CAN_read(0x1E);
+    printf("CANSTAT: 0x%02X\n\r", stat);
+
+    CAN_FRAME msg_send;
+    msg_send.id = (uint32_t)0b00000001;
+    msg_send.dlc = 4;
+    msg_send.data[0] = 0;
+    msg_send.data[1] = 1;
+    msg_send.data[2] = 2;
+    msg_send.data[3] = 3;
+
+    CAN_transmit_message(msg_send, 0);
+
+    CAN_FRAME msg_rcv;
+
+    _delay_us(40);
+
+    CAN_receive_message(&msg_rcv, 0);
+
+    for (int i = 0; i < 4; i++) printf("Message received, data %d: %d\n\r", i, msg_rcv.data[i]);
     
     // Write all pixels
     /*
@@ -145,7 +167,7 @@ int external_memory_init(void) {
     }*/
 
     // OLED_draw_string(0, 0, "Hei, jeg heter Anders og liker fisk", 'm');
-
+    /*
     OLED_main_menu();
 
     int* ADC_values = malloc(sizeof(int)*4);
@@ -177,7 +199,7 @@ int external_memory_init(void) {
 
 
         free(ADC_values);
-    }
+    }*/
 
     //OLED_goto_address(2, 20);
 

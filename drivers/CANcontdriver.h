@@ -15,7 +15,7 @@
 
 char CAN_read(char address);
 
-void CAN_reset();
+void CAN_controller_reset();
 
 void CAN_write(char data, char address);
 
