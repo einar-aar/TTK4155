@@ -2,8 +2,6 @@
 #include "SPIdriver.h"
 #include <util/delay.h>
 
-
-
 char CAN_read(char address) {
 
     SPI_slaveselect(CAN); //pulling CS_inv low to start reading (choosing CAN slave)
@@ -24,6 +22,8 @@ char CAN_read(char address) {
 
 
 void CAN_controller_reset() {
+
+    SPI_release_slave();
 
     SPI_slaveselect(CAN); //pulling CS_inv low 
     SPI_transfer(CAN_RESET); //sending instruction byte
@@ -93,5 +93,4 @@ void CAN_bit_modify(char address, char data, char mask_byte) {
     _delay_us(2);
 
     SPI_release_slave(); //raising CS_inv
-
 }

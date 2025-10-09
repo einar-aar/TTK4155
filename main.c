@@ -101,7 +101,9 @@ int external_memory_init(void) {
     // OLED_init();
     CAN_controller_init();
 
-    uint8_t stat = CAN_read(0x1E);
+    _delay_ms(1000);
+
+    uint8_t stat = CAN_read(0x0E);
     printf("CANSTAT: 0x%02X\n\r", stat);
 
     CAN_FRAME msg_send;
@@ -118,9 +120,16 @@ int external_memory_init(void) {
 
     _delay_us(40);
 
-    CAN_receive_message(&msg_rcv, 0);
+    CAN_receive_message(&msg_rcv);
 
     for (int i = 0; i < 4; i++) printf("Message received, data %d: %d\n\r", i, msg_rcv.data[i]);
+
+    SPI_slaveselect(CAN);
+
+    while(1) {
+
+        CAN_transmit_message(msg_send, 0);
+    }
     
     // Write all pixels
     /*
@@ -132,8 +141,7 @@ int external_memory_init(void) {
             OLED_transmit(255, false);
         }
     }
-    */
-    /*
+
     // Clear all pixels
     */
     /*

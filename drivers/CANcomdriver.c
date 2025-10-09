@@ -2,13 +2,18 @@
 #include "CANcontdriver.h"
 #include "SPIdriver.h"
 #include "mcp2515.h"
+#include <stdio.h>
 
 #define TQ 0.00000025
 
 void CAN_controller_init() {
     
-    // SPI_init(); //initialize SPI
     CAN_controller_reset(); // reset CAN controller (sets to config mode automatically)
+
+    _delay_ms(3);
+
+    uint8_t stat = CAN_read(0x0E);
+    printf("CANSTAT: 0x%02X\n\r", stat);
 
     // Configrue bit_timing
 
@@ -34,6 +39,8 @@ void CAN_controller_init() {
     // Leaving 8 - 6 = 2 TQ for PS2
 
     // setting SJW bits to 0 --> synch jump width length = 1 x TQ
+
+    _delay_us(40);
 
     uint8_t BRP = 0b00000001;
 
@@ -86,8 +93,11 @@ void CAN_transmit_message(CAN_FRAME frame, int buffer) {
 
         for (int i = 0; i < frame.dlc; i++) CAN_write(frame.data[i], MCP_TXB1D0 + i);
 
-        // CAN_write(MCP_RTS_TX1, MCP_TXB1CTRL);
-        CAN_request_to_send(1);
+        //CAN_write(MCP_RTS_TX1, MCP_TXB1CTRL);
+        //CAN_request_to_send(1);
+        SPI_slaveselect(CAN);
+        SPI_transfer(MCP_RTS_TX1);
+        SPI_release_slave();
     
     } else {
 
@@ -97,12 +107,15 @@ void CAN_transmit_message(CAN_FRAME frame, int buffer) {
 
         for (int i = 0; i < frame.dlc; i++) CAN_write(frame.data[i], MCP_TXB0D0 + i);
 
-        // CAN_write(MCP_RTS_TX0, MCP_TXB0CTRL);
-        CAN_request_to_send(0);
+        //CAN_write(MCP_RTS_TX0, MCP_TXB0CTRL);
+        //CAN_request_to_send(0);
+        SPI_slaveselect(CAN);
+        SPI_transfer(MCP_RTS_TX0);
+        SPI_release_slave();
     }
 }
 
-void CAN_receive_message(CAN_FRAME *frame, int buffer) {
+void CAN_receive_message(CAN_FRAME *frame) {
 
     //declearing addresses
     uint8_t data_bytes[8]; //storage array for the 8 bytes that are read directly from the MCP2515
@@ -111,7 +124,21 @@ void CAN_receive_message(CAN_FRAME *frame, int buffer) {
     uint8_t dlcAddr;
     uint8_t dataAddr;
 
+    
+    
+    /*while(1) {
+        if(MCP_CANINTF==0b00000001) break;
+        if(MCP_CANINTF == 0b00000010) break;
+    }*/
+
+    int buffer = 0;
+
     //choosing registeraddresses based on buffer 
+    if(MCP_CANINTF==0b00000010) {
+        buffer = 1;
+    } else if (MCP_CANINTF==0b00000001){
+        buffer = 0;
+    }
 
     if (buffer == 1) { //buffer = RXB1
 
