@@ -98,8 +98,10 @@ void CAN_transmit_message(CAN_FRAME frame, int buffer) {
         SPI_slaveselect(CAN);
         SPI_transfer(MCP_RTS_TX1);
         SPI_release_slave();
+
+        printf("Wrote to b1\n\r");
     
-    } else {
+    } else if (buffer == 0) {
 
         CAN_write(ID_high, MCP_TXB0SIDH);
         CAN_write(ID_low, MCP_TXB0SIDL);
@@ -112,6 +114,8 @@ void CAN_transmit_message(CAN_FRAME frame, int buffer) {
         SPI_slaveselect(CAN);
         SPI_transfer(MCP_RTS_TX0);
         SPI_release_slave();
+
+        printf("Wrote to b0\n\r");
     }
 }
 
@@ -125,19 +129,28 @@ void CAN_receive_message(CAN_FRAME *frame) {
     uint8_t dataAddr;
 
     
-    
-    /*while(1) {
-        if(MCP_CANINTF==0b00000001) break;
-        if(MCP_CANINTF == 0b00000010) break;
-    }*/
+    printf("in receive func\n\r");
 
-    int buffer = 0;
+    uint8_t intf = 0; //leser frainterrupt registeret
+
+    while(!(intf & 0b00000011)) {
+        intf = CAN_read(MCP_CANINTF);
+        //if((MCP_CANINTF & 0b00000001)==0b00000001) break;
+        //if((MCP_CANINTF & 0b00000010)==0b00000010) break;
+        //if(MCP_CANINTF == 0b00000010) break;
+        printf("in while loop\n\r");
+    }
+
+
+    int buffer = 2;
 
     //choosing registeraddresses based on buffer 
-    if(MCP_CANINTF==0b00000010) {
-        buffer = 1;
-    } else if (MCP_CANINTF==0b00000001){
+    if((intf & 0b00000001)==0b00000001) {
         buffer = 0;
+        printf("interupt b0 raised\n\r");
+    } else if ((intf & 0b00000010)==0b00000010){
+        buffer = 1;
+        printf("interupt b1 raised\n\r");
     }
 
     if (buffer == 1) { //buffer = RXB1
@@ -146,13 +159,16 @@ void CAN_receive_message(CAN_FRAME *frame) {
         sidlAddr = MCP_RXB1SIDL;
         dlcAddr = MCP_RXB1DLC;
         dataAddr = MCP_RXB1D0;
+        printf("fetching b1 data\n\r");
 
-    } else { //buffer = RXB0
+    } else if (buffer ==0) { //buffer = RXB0
 
         sidhAddr = MCP_RXB0SIDH;
         sidlAddr = MCP_RXB0SIDL;
         dlcAddr = MCP_RXB0DLC;
         dataAddr = MCP_RXB0D0;
+        printf("fetching b0 data\n\r");
+
     }
 
     //calculating 11-bit CAN ID
