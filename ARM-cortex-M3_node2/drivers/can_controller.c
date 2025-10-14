@@ -12,9 +12,8 @@
 
 #include "sam.h"
 
-#include "../uart_and_printf/printf-stdarg.h"
-
-
+//#include "../uart_and_printf/printf-stdarg.h"
+#include "uart.h"
 /**
  * \brief Initialize can bus with predefined number of rx and tx mailboxes, 
  * CAN0->CAN_MB[0] is used for transmitting

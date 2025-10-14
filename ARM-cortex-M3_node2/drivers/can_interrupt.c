@@ -13,7 +13,8 @@
 #include <stdio.h>
 #include "sam.h"
 
-#include "../uart_and_printf/printf-stdarg.h"
+//#include "../uart_and_printf/printf-stdarg.h"
+#include "uart.h"
 
 #include "can_controller.h"
 

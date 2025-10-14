@@ -3,6 +3,7 @@
 
 #include <stdint.h>
 
+
 // Struct with bit timing information
 // See `can_init` for usage example
 typedef struct CanInit CanInit;

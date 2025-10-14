@@ -6,8 +6,15 @@ MCUTYPE = __SAM3X8E__
 # Use relative file paths and a backslash before newline.
 # Do NOT use a backslash after the last file.
 SOURCE_FILES = \
-	$(BOOTUP) \ main.c drivers/can_controller.c drivers/can_interrupt.c drivers/can.c drivers/time.c drivers/uart.c sam/interrupt/interrupt_sam_nvic.c sam/sam3x/source/exceptions.c sam/sam3x/source/startup_sam3x.c sam/sam3x/source/system_sam3x.c 
+	$(BOOTUP) \
+	main.c \
+	drivers/can.c drivers/time.c drivers/uart.c\
+	$(wildcard sam/interrupt/*.c) \
+	$(wildcard sam/sam3x/source*.c)
 
+#   filename1.c \
+#   filename2.c \
+#	filenameN.c
 
 # Feel free to ignore anything below this line
 VPATH:= $(dir $(SOURCE_FILES))
@@ -23,7 +30,7 @@ ELF=$(BUILD_DIR)/main.elf
 
 LDFLAGS:= -T$(LDSCRIPT) -mthumb -mcpu=cortex-m3 -Wl,--gc-sections
 CFLAGS:= -mcpu=cortex-m3 -mthumb -g -std=c11 -MMD
-CFLAGS+= -I sam -I sam/sam3x/include -I sam/sam3x/source -I sam/cmsis -I .
+CFLAGS+= -I sam -I sam/sam3x/include -I sam/sam3x/source -I sam/cmsis -I drivers -I .
 CFLAGS+= -D $(MCUTYPE)
 
 .DEFAULT_GOAL := $(ELF)
