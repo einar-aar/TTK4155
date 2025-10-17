@@ -1,7 +1,10 @@
 #include <stdio.h>
 #include <stdarg.h>
 #include "sam.h"
+#include "drivers/uart.h"
 
+#define baud 9600
+#define F_CPU 84000000
 /*
  * Remember to update the Makefile with the (relative) path to the uart.c file.
  * This starter code will not compile until the UART file has been included in the Makefile. 
@@ -20,12 +23,23 @@ int main()
     WDT->WDT_MR = WDT_MR_WDDIS; //Disable Watchdog Timer
 
     //Uncomment after including uart above
-    //uart_init(/*cpufreq*/, /*baud*/);
-    //printf("Hello World\n\r");
+    uart_init(F_CPU, baud);
+    printf("Hello World\n\r");
+
+    // 1. Aktiver klokke til PIOB
+    PMC->PMC_PCER0 |= (1 << ID_PIOB);
+
+    PIOB->PIO_PER = (1u << 27);
+    PIOB->PIO_OER = (1u << 27);
 
     while (1)
     {
-        /* code */
+        PIOB->PIO_SODR = (1u << 27);
+        for (volatile int i = 0; i < 1000000; i++);
+
+        // LED av
+        PIOB->PIO_CODR = (1u << 27);
+        for (volatile int i = 0; i < 1000000; i++);
     }
     
 }

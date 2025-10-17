@@ -1,5 +1,7 @@
 #include "sam.h"
 #include <stdio.h>
+#include "uart.h"
+
 
 #define F_CPU 84000000
 
@@ -174,5 +176,3 @@ int _read(int file, char* ptr, int len){
     return nread;
 }
 
-
-   
