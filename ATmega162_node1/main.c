@@ -118,7 +118,7 @@ int external_memory_init(void) {
 
     CAN_FRAME msg_rcv;
 
-    _delay_us(40);
+    _delay_ms(100);
 
     CAN_receive_message(&msg_rcv);
 

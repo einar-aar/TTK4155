@@ -8,8 +8,6 @@
 // Internally, receiving is handled with interrupts and a ring buffer, so no characters
 // are lost, until the buffer is full. If necessary, you can change this buffer size in 
 // uart.c
-#ifndef UART
-#define UART
 
 
 // Initialize. Hooks stdio functions (like `printf`)
@@ -34,5 +32,3 @@ uint8_t uart_rx(uint8_t* val);
 //        printf("%d\n", result);
 //    }
 int uart_flush(char* buf, int len);
-
-#endif

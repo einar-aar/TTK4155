@@ -40,12 +40,24 @@ uint8_t can_init_def_tx_rx_mb(uint32_t can_br)
  * \retval Success(0) or failure(1)
  */
 
+/*
+Calculations for CAN bit timing:
+
+sampling = 500 kbit/s
+TQ = (BRP + 1) / MCK
+
+Propagation TQ = 1
+Sync TQ = 1
+Phase 1 TQ = 4
+Phase 2 TQ = 8 - 6 = 2
+SJW = 1
+*/
 
 uint8_t can_init(uint32_t can_br, uint8_t num_tx_mb, uint8_t num_rx_mb)
 {
 	
 	//Make sure num_rx_mb and num_tx_mb is valid
-	if(num_rx_mb > 8 | num_tx_mb > 8 | num_rx_mb + num_tx_mb > 8)
+	if(num_rx_mb > 8 || num_tx_mb > 8 || num_rx_mb + num_tx_mb > 8)
 	{
 		return 1; //Too many mailboxes is configured
 	}
@@ -58,9 +70,13 @@ uint8_t can_init(uint32_t can_br, uint8_t num_tx_mb, uint8_t num_rx_mb)
 	//Clear status register on read
 	ul_status = CAN0->CAN_SR; 
 	
+	CAN0->CAN_IDR = 0xFFFFFFFFu;
+	NVIC_DisableIRQ(ID_CAN0);
+	NVIC_ClearPendingIRQ(ID_CAN0);
 	
 	// Disable interrupts on CANH and CANL pins
 	PIOA->PIO_IDR = PIO_PA8A_URXD | PIO_PA9A_UTXD;
+	PIOA->PIO_IDR = PIO_PA0A_CANTX0 | PIO_PA1A_CANRX0;
 	
 	//Select CAN0 RX and TX in PIOA
 	uint32_t ul_sr = PIOA->PIO_ABSR;
@@ -77,8 +93,28 @@ uint8_t can_init(uint32_t can_br, uint8_t num_tx_mb, uint8_t num_rx_mb)
 	PMC->PMC_PCR = PMC_PCR_EN | (0 << PMC_PCR_DIV_Pos) | PMC_PCR_CMD | (ID_CAN0 << PMC_PCR_PID_Pos); // DIV = 1(can clk = MCK/2), CMD = 1 (write), PID = 2B (CAN0)
 	PMC->PMC_PCER1 |= 1 << (ID_CAN0 - 32);
 	
-	//Set baudrate, Phase1, phase2 and propagation delay for can bus. Must match on all nodes!
-	CAN0->CAN_BR = can_br; 
+	if (can_br == 0) {
+
+		uint32_t brp_val   = 20;
+		uint32_t propag_v  = 0;
+		uint32_t phase1_v  = 3;
+		uint32_t phase2_v  = 1;
+		uint32_t sjw_v     = 0;
+		uint32_t smp_v     = 0;
+
+		uint32_t br = 0;
+		br |= CAN_BR_BRP(brp_val);
+		br |= CAN_BR_PROPAG(propag_v);
+		br |= CAN_BR_PHASE1(phase1_v);
+		br |= CAN_BR_PHASE2(phase2_v);
+		br |= CAN_BR_SJW(sjw_v);
+		br |= CAN_BR_SMP(smp_v);
+		CAN0->CAN_BR = br;
+
+	} else {
+
+		CAN0->CAN_BR = can_br;
+	}
 	
 
 	/****** Start of mailbox configuration ******/

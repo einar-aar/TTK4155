@@ -18,6 +18,18 @@ void can_printmsg(CanMsg m){
 #define txMailbox 0
 #define rxMailbox 1
 
+/*
+Calculations for CAN bit timing:
+
+sampling = 500 kbit/s
+TQ = (BRP + 1) / F
+TQ = 8, F = 84MHz => BRP = 21
+Propagation TQ = 1
+Sync TQ = 1
+Phase 1 TQ = 4
+Phase 2 TQ = 8 - 6 = 2
+SJW = 1
+*/
 
 void can_init(CanInit init, uint8_t rxInterrupt){
     // Disable CAN
@@ -42,6 +54,10 @@ void can_init(CanInit init, uint8_t rxInterrupt){
     // DIV = 1 (can clk = MCK/2), CMD = 1 (write), PID = 2B (CAN0)
     PMC->PMC_PCR = PMC_PCR_EN | (0/*??*/ << PMC_PCR_DIV_Pos) | PMC_PCR_CMD | (ID_CAN0 << PMC_PCR_PID_Pos); 
     PMC->PMC_PCER1 |= 1 << (ID_CAN0 - 32);
+
+    CAN0->CAN_IDR = 0xFFFFFFFFu;
+    NVIC_DisableIRQ(ID_CAN0);
+    NVIC_ClearPendingIRQ(ID_CAN0);
     
     //Set baudrate, Phase1, phase2 and propagation delay for can bus. Must match on all nodes!
     CAN0->CAN_BR = init.reg; 

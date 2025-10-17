@@ -47,10 +47,10 @@ void CAN_controller_init() {
     uint8_t cnf1_val = SJW1 | BRP; 
     CAN_write(cnf1_val, MCP_CNF1); //configurating CNF1 register
 
-    uint8_t cnf2_val = BTLMODE | SAMPLE_1X | 0b00100000 | 0b00000001 ; //BTLMODE = 1, SAM = 0, PHseg1 = 4, PRSEG = 1
+    uint8_t cnf2_val = BTLMODE | SAMPLE_1X | 0b00011000 | 0b00000000 ; //BTLMODE = 1, SAM = 0, PHseg1 = 4 (011 + 1), PRSEG = 1 (000 + 1)
     CAN_write(cnf2_val, MCP_CNF2);
 
-    uint8_t cnf3_val = SOF_DISABLE | WAKFIL_DISABLE | 0b00000010; //PHSEG2 = 2 (010), assuming CANCTRL = 0 -> SOF = dont care, WAKFIL = 0 ( wake up filter diabled)
+    uint8_t cnf3_val = SOF_DISABLE | WAKFIL_DISABLE | 0b00000001; //PHSEG2 = 2 (001 + 1), assuming CANCTRL = 0 -> SOF = dont care, WAKFIL = 0 ( wake up filter diabled)
     CAN_write(cnf3_val, MCP_CNF3);
 
 
@@ -72,7 +72,7 @@ void CAN_controller_init() {
     CAN_write(caninte_val, MCP_CANINTE);
 
     // Set Mode = Loopback
-    uint8_t canctrl_val = MODE_LOOPBACK; // 3 MSB defines the mode (010 = loopback, 000 = normal, 100 = configuration)
+    uint8_t canctrl_val = MODE_NORMAL/*MODE_LOOPBACK*/; // 3 MSB defines the mode (010 = loopback, 000 = normal, 100 = configuration)
     CAN_write(canctrl_val, MCP_CANCTRL);
 }
 
@@ -138,7 +138,6 @@ void CAN_receive_message(CAN_FRAME *frame) {
         //if((MCP_CANINTF & 0b00000001)==0b00000001) break;
         //if((MCP_CANINTF & 0b00000010)==0b00000010) break;
         //if(MCP_CANINTF == 0b00000010) break;
-        printf("in while loop\n\r");
     }
 
 
