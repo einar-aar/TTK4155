@@ -114,6 +114,9 @@ int external_memory_init(void) {
     msg_send.data[2] = 3;
     msg_send.data[3] = 2;
 
+    while (1) {
+        CAN_transmit_message(msg_send, 0);
+    }
     CAN_transmit_message(msg_send, 0);    
 
     CAN_FRAME msg_rcv;
