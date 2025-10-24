@@ -109,11 +109,12 @@ int external_memory_init(void) {
     CAN_FRAME msg_send;
     msg_send.id = (uint32_t)0b00000001;
     msg_send.dlc = 4;
-    msg_send.data[0] = 5;
-    msg_send.data[1] = 0;
-    msg_send.data[2] = 3;
-    msg_send.data[3] = 2;
+    msg_send.data[0] = 4;
+    msg_send.data[1] = 4;
+    msg_send.data[2] = 4;
+    msg_send.data[3] = 6;
 
+    
     while (1) {
         CAN_transmit_message(msg_send, 0);
     }

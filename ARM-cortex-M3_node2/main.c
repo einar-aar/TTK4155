@@ -29,7 +29,7 @@ int main()
     init.reg = CAN_BR_BRP(20) | CAN_BR_PROPAG(0) | CAN_BR_PHASE1(4) | CAN_BR_PHASE2(2) | CAN_BR_SJW(2);
 
     can_init(init, 0);
-    printf("CAN initialized\n\r");
+    printf("CAN initialized\n");
 
     WDT->WDT_MR = WDT_MR_WDDIS; //Disable Watchdog Timer
 
@@ -45,12 +45,12 @@ int main()
 
     while (1)
     {
-        /*PIOB->PIO_SODR = (1u << 27);
+        PIOB->PIO_SODR = (1u << 27);
         for (volatile int i = 0; i < 1000000; i++);
 
         // LED av
         PIOB->PIO_CODR = (1u << 27);
-        for (volatile int i = 0; i < 1000000; i++);*/
+        for (volatile int i = 0; i < 1000000; i++);
 
         // Test can
         if (can_rx(&rx)) {               // mottatt melding?
