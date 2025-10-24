@@ -79,7 +79,9 @@ int external_memory_init(void) {
         printf("Failed to initialize external memory");
     }
 
+    
     SRAM_test();
+    
 
     /*ADC[0]=0x04;
     uint8_t value=ADC[0];
@@ -103,6 +105,8 @@ int external_memory_init(void) {
 
     _delay_ms(1000);
 
+   
+
     uint8_t stat = CAN_read(0x0E);
     printf("CANSTAT: 0x%02X\n\r", stat);
 
@@ -123,6 +127,7 @@ int external_memory_init(void) {
     _delay_ms(100);
 
     CAN_receive_message(&msg_rcv);
+    //printf("CANSTAT: 0x%02X\n\r")
 
     for (int i = 0; i < 4; i++) printf("Message received, data %d: %d\n\r", i, msg_rcv.data[i]);
     
