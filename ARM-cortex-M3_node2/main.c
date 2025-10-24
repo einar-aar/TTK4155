@@ -2,7 +2,8 @@
 #include <stdarg.h>
 #include "sam.h"
 #include "drivers/uart.h"
-#include "drivers/can.h"
+#include "drivers/can_controller.h"
+#include "drivers/can_interrupt.h"
 
 #define baud 9600
 #define F_CPU 84000000 // 84 MHz
@@ -25,11 +26,16 @@ int main()
     uart_init(F_CPU, baud);
     printf("Hello World\n\r");
 
+    uint32_t can_br = CAN_BR_BRP(20) | CAN_BR_PROPAG(0) | CAN_BR_PHASE1(4) | CAN_BR_PHASE2(2) | CAN_BR_SJW(2);
+
+    can_init_def_tx_rx_mb(can_br);
+
+    /*
     CanInit init;
     init.reg = CAN_BR_BRP(20) | CAN_BR_PROPAG(0) | CAN_BR_PHASE1(4) | CAN_BR_PHASE2(2) | CAN_BR_SJW(2);
 
-    can_init(init, 0);
-    printf("CAN initialized\n");
+    can_init(init, 0);*/
+    printf("CAN initialized\n\r");
 
     WDT->WDT_MR = WDT_MR_WDDIS; //Disable Watchdog Timer
 
@@ -41,8 +47,20 @@ int main()
     PIOB->PIO_OER = (1u << 27);
 
     // Test CAN
-    CanMsg rx, tx;
+    // CanMsg rx, tx;
+    CAN_MESSAGE msg;
 
+    msg.id = (uint32_t)0b00000001;
+    msg.data_length = 4;
+
+    msg.data[0] = 1;
+    msg.data[1] = 3;
+    msg.data[2] = 5;
+    msg.data[3] = 7;
+
+    can_send(&msg, 0);
+    printf("Can message sent\n\r");
+    
     while (1)
     {
         PIOB->PIO_SODR = (1u << 27);
@@ -53,7 +71,7 @@ int main()
         for (volatile int i = 0; i < 1000000; i++);
 
         // Test can
-        if (can_rx(&rx)) {               // mottatt melding?
+        /*if (can_rx(&rx)) {               // mottatt melding?
             can_printmsg(rx);
 
             tx.id = rx.id;               // ekko med samme ID
@@ -63,8 +81,8 @@ int main()
             }
 
             can_tx(tx);
-        }
-
+        }*/
+        
     }
     
 }
