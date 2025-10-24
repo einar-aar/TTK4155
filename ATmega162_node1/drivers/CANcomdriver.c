@@ -17,14 +17,14 @@ void CAN_controller_init() {
 
     // Configrue bit_timing
 
-    // Bit rate = 500 kbits/sek (maks 1 Mbit/s)
-    // TQ per bit = 8
+    // Bit rate = 100 kbits/sek (maks 1 Mbit/s)
+    // TQ per bit = 10
     // TQ time = 1 / bitrate / TQ per bit
 
     // Fosc = 16 MHz
-    // BRP = TQ time * Fosc / 2 - 1 = 1
+    // BRP = TQ time * Fosc / 2 - 1 = 7
 
-    // BTLMODE: 0 -> the length of PS2 is set to max(PS1, 2*TQ), 1 -> the length of PS2 is explicitly set in CNF3
+    // BTLMODE: 1 -> the length of PS2 is explicitly set in CNF3
 
     // BIT timing constraints:
     // PropSeg + PS1 >= PS2
@@ -38,19 +38,19 @@ void CAN_controller_init() {
     // 4 TQ for PS1
     // Leaving 8 - 6 = 2 TQ for PS2
 
-    // setting SJW bits to 0 --> synch jump width length = 1 x TQ
+    // setting SJW bits to 2 for 3 TQ
 
     _delay_us(40);
 
     uint8_t BRP = 0b00000001;
 
-    uint8_t cnf1_val = SJW1 | BRP; 
+    uint8_t cnf1_val = SJW3 | BRP; 
     CAN_write(cnf1_val, MCP_CNF1); //configurating CNF1 register
 
-    uint8_t cnf2_val = BTLMODE | SAMPLE_1X | 0b00011000 | 0b00000000 ; //BTLMODE = 1, SAM = 0, PHseg1 = 4 (011 + 1), PRSEG = 1 (000 + 1)
+    uint8_t cnf2_val = BTLMODE | SAMPLE_1X | 0b00100000 | 0b00000000 ; //BTLMODE = 1, SAM = 0, PHseg1 = 5 - 1 = 4, PRSEG = 1 - 1 = 0
     CAN_write(cnf2_val, MCP_CNF2);
 
-    uint8_t cnf3_val = SOF_DISABLE | WAKFIL_DISABLE | 0b00000001; //PHSEG2 = 2 (001 + 1), assuming CANCTRL = 0 -> SOF = dont care, WAKFIL = 0 ( wake up filter diabled)
+    uint8_t cnf3_val = SOF_DISABLE | WAKFIL_DISABLE | 0b00000010; // assuming CANCTRL = 0 -> SOF = dont care, WAKFIL = 0 ( wake up filter diabled), PHSEG2 = 3 - 1 = 2
     CAN_write(cnf3_val, MCP_CNF3);
 
 
@@ -71,7 +71,7 @@ void CAN_controller_init() {
     uint8_t caninte_val = 0b00000011; //interrupting when message recieved in buffers (RX1IE = 1, RX0IE = 1), other interrupts disabled
     CAN_write(caninte_val, MCP_CANINTE);
 
-    // Set Mode = Loopback
+    // Set Mode = Loopback or NORMAL
     uint8_t canctrl_val = MODE_NORMAL/*MODE_LOOPBACK*/; // 3 MSB defines the mode (010 = loopback, 000 = normal, 100 = configuration)
     CAN_write(canctrl_val, MCP_CANCTRL);
 }

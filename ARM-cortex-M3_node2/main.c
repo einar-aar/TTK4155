@@ -5,7 +5,7 @@
 #include "drivers/can.h"
 
 #define baud 9600
-#define F_CPU 84000000
+#define F_CPU 84000000 // 84 MHz
 /*
  * Remember to update the Makefile with the (relative) path to the uart.c file.
  * This starter code will not compile until the UART file has been included in the Makefile. 
@@ -18,6 +18,7 @@
 //#include "../path_to/uart.h"
 
 int main()
+
 {
     SystemInit();
 
@@ -25,7 +26,7 @@ int main()
     printf("Hello World\n\r");
 
     CanInit init;
-    init.reg = CAN_BR_BRP(20) | CAN_BR_PROPAG(0) | CAN_BR_PHASE1(3) | CAN_BR_PHASE2(1) | CAN_BR_SJW(0);
+    init.reg = CAN_BR_BRP(20) | CAN_BR_PROPAG(0) | CAN_BR_PHASE1(4) | CAN_BR_PHASE2(2) | CAN_BR_SJW(2);
 
     can_init(init, 0);
     printf("CAN initialized\n\r");

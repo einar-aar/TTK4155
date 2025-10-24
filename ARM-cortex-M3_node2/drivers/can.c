@@ -21,17 +21,11 @@ void can_printmsg(CanMsg m){
 /*
 Calculations for CAN bit timing:
 
-sampling = 500 kbit/s
-TQ = (BRP + 1) / F
-TQ = 8, F = 84MHz => BRP = 21
-Propagation TQ = 1
-Sync TQ = 1
-Phase 1 TQ = 4
-Phase 2 TQ = 8 - 6 = 2
-SJW = 1
+
 */
 
 void can_init(CanInit init, uint8_t rxInterrupt){
+
     // Disable CAN
     CAN0->CAN_MR &= ~CAN_MR_CANEN; 
     
@@ -52,7 +46,7 @@ void can_init(CanInit init, uint8_t rxInterrupt){
     
     // Enable Clock for CAN0 in PMC
     // DIV = 1 (can clk = MCK/2), CMD = 1 (write), PID = 2B (CAN0)
-    PMC->PMC_PCR = PMC_PCR_EN | (0/*??*/ << PMC_PCR_DIV_Pos) | PMC_PCR_CMD | (ID_CAN0 << PMC_PCR_PID_Pos); 
+    PMC->PMC_PCR = PMC_PCR_EN | (2/*??*/ << PMC_PCR_DIV_Pos) | PMC_PCR_CMD | (ID_CAN0 << PMC_PCR_PID_Pos); 
     PMC->PMC_PCER1 |= 1 << (ID_CAN0 - 32);
 
     CAN0->CAN_IDR = 0xFFFFFFFFu;
@@ -74,7 +68,8 @@ void can_init(CanInit init, uint8_t rxInterrupt){
     CAN0->CAN_MB[rxMailbox].CAN_MID = CAN_MID_MIDE;
     CAN0->CAN_MB[rxMailbox].CAN_MMR = CAN_MMR_MOT_MB_RX;
     CAN0->CAN_MB[rxMailbox].CAN_MCR |= CAN_MCR_MTCR;
-    if(rxInterrupt){
+
+    if (rxInterrupt){
         // Enable interrupt on receive
         CAN0->CAN_IER |= (1 << rxMailbox); 
         // Enable interrupt in NVIC 
@@ -86,12 +81,13 @@ void can_init(CanInit init, uint8_t rxInterrupt){
 }
 
 
-void can_tx(CanMsg m){
+void can_tx(CanMsg m) {
+
     while(!(CAN0->CAN_MB[txMailbox].CAN_MSR & CAN_MSR_MRDY)){}
     
     // Set message ID and use CAN 2.0B protocol
     CAN0->CAN_MB[txMailbox].CAN_MID = CAN_MID_MIDvA(m.id) | CAN_MID_MIDE ;
-        
+    
     // Coerce maximum 8 byte length
     m.length = m.length > 8 ? 8 : m.length;
     
