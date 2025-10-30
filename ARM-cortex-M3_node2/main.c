@@ -4,6 +4,7 @@
 #include "drivers/uart.h"
 #include "drivers/can_controller.h"
 #include "drivers/can_interrupt.h"
+#include "drivers/PWM.h"
 
 #define baud 9600
 #define F_CPU 84000000 // 84 MHz
@@ -41,7 +42,9 @@ int main()
     PIOB->PIO_PER = (1u << 27);
     PIOB->PIO_OER = (1u << 27);
 
-    // Test CAN
+    PWMinit(F_CPU);
+
+    /*// Test CAN
     CAN_MESSAGE msg;
 
     msg.id = (uint32_t)0b00000001;
@@ -54,7 +57,7 @@ int main()
 
     // can_send(&msg, 0);
     // printf("Can message sent\n\r");
-
+    */
     
     
     while (1)

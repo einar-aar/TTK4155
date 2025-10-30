@@ -5,7 +5,7 @@ MCUTYPE = __SAM3X8E__
 SOURCE_FILES = \
 	$(BOOTUP) \
 	main.c \
-	drivers/can_controller.c drivers/can_interrupt.c drivers/time.c drivers/uart.c \
+	drivers/can_controller.c drivers/can_interrupt.c drivers/time.c drivers/uart.c drivers/PWM.c \
 	$(wildcard sam/interrupt/*.c)
 
 # NB: For å unngå kollisjon når to filer har samme navn i ulike mapper
