@@ -26,15 +26,10 @@ int main()
     uart_init(F_CPU, baud);
     printf("Hello World\n\r");
 
-    uint32_t can_br = CAN_BR_BRP(20) | CAN_BR_PROPAG(0) | CAN_BR_PHASE1(4) | CAN_BR_PHASE2(2) | CAN_BR_SJW(2);
+    uint32_t can_br = CAN_BR_BRP(20) | CAN_BR_PROPAG(0) | CAN_BR_PHASE1(4) | CAN_BR_PHASE2(2) | CAN_BR_SJW(1);
 
     can_init_def_tx_rx_mb(can_br);
 
-    /*
-    CanInit init;
-    init.reg = CAN_BR_BRP(20) | CAN_BR_PROPAG(0) | CAN_BR_PHASE1(4) | CAN_BR_PHASE2(2) | CAN_BR_SJW(2);
-
-    can_init(init, 0);*/
     printf("CAN initialized\n\r");
 
     WDT->WDT_MR = WDT_MR_WDDIS; //Disable Watchdog Timer
@@ -47,7 +42,6 @@ int main()
     PIOB->PIO_OER = (1u << 27);
 
     // Test CAN
-    // CanMsg rx, tx;
     CAN_MESSAGE msg;
 
     msg.id = (uint32_t)0b00000001;
@@ -58,8 +52,10 @@ int main()
     msg.data[2] = 5;
     msg.data[3] = 7;
 
-    can_send(&msg, 0);
-    printf("Can message sent\n\r");
+    // can_send(&msg, 0);
+    // printf("Can message sent\n\r");
+
+    
     
     while (1)
     {
@@ -69,20 +65,13 @@ int main()
         // LED av
         PIOB->PIO_CODR = (1u << 27);
         for (volatile int i = 0; i < 1000000; i++);
-
-        // Test can
-        /*if (can_rx(&rx)) {               // mottatt melding?
-            can_printmsg(rx);
-
-            tx.id = rx.id;               // ekko med samme ID
-            tx.length = rx.length;
-            for (uint8_t i = 0; i < rx.length; i++) {
-                tx.byte[i] = rx.byte[i];
-            }
-
-            can_tx(tx);
-        }*/
         
+        CAN_MESSAGE msg_rx;
+
+        can_receive(&msg_rx, 0);
+
+        printf("Data received: %d %d %d %d\n\r", msg_rx.data[0], msg_rx.data[1], msg_rx.data[2], msg_rx.data[3]);
+        fflush(stdout);
     }
     
 }

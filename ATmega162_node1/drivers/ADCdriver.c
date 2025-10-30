@@ -89,8 +89,7 @@ int* ADC_read_joystick_and_pad(void) {
             else {
                 scaled = (int) (((float)(original_value-touchpad_center)/(touchpad_max_val-touchpad_center))*-100);
             }
-         }
-          
+         }  
 
         
 

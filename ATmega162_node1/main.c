@@ -9,6 +9,7 @@
 #include "drivers/fonts.h"
 #include "drivers/CANcontdriver.h"
 #include "drivers/CANcomdriver.h"
+#include "drivers/JOYSTICKdriver.h"
 
 // ATmega162 cpu frequency
 #define F_CPU 4915200UL
@@ -81,6 +82,8 @@ int external_memory_init(void) {
 
     SRAM_test();
 
+    
+
     /*ADC[0]=0x04;
     uint8_t value=ADC[0];
     printf("ADC-verdi: %02X\n\n\r", value);
@@ -101,6 +104,13 @@ int external_memory_init(void) {
     // OLED_init();
     CAN_controller_init();
 
+    while(1) {
+        sendJoystickPos();
+        _delay_ms(500);
+
+
+    }
+
     _delay_ms(1000);
 
     uint8_t stat = CAN_read(0x0E);
@@ -112,20 +122,19 @@ int external_memory_init(void) {
     msg_send.data[0] = 4;
     msg_send.data[1] = 4;
     msg_send.data[2] = 4;
-    msg_send.data[3] = 6;
+    msg_send.data[3] = 7;
 
     
     
-    //CAN_transmit_message(msg_send, 0);    
-
+    /*
     CAN_FRAME msg_rcv;
 
-    _delay_ms(100);
+    _delay_ms(1000);
 
     CAN_receive_message(&msg_rcv);
 
     for (int i = 0; i < 4; i++) printf("Message received, data %d: %d\n\r", i, msg_rcv.data[i]);
-    
+    */
     // Write all pixels
     /*
     for (int i = 0; i < 8; i++) {
