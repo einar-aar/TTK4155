@@ -22,7 +22,8 @@ void CAN_controller_init() {
     // TQ time = 1 / bitrate / TQ per bit
 
     // Fosc = 16 MHz
-    // BRP = TQ time * Fosc / 2 - 1 = 7
+    // BRP + 1 = TQ time * Fosc / 2 = 8
+    // BRP = 8 - 1 = 7
 
     // BTLMODE: 1 -> the length of PS2 is explicitly set in CNF3
 
@@ -42,9 +43,9 @@ void CAN_controller_init() {
 
     _delay_us(40);
 
-    uint8_t BRP = 0b00000001;
+    uint8_t BRP = 0b00000111;
 
-    uint8_t cnf1_val = SJW3 | BRP; 
+    uint8_t cnf1_val = SJW2 | BRP; 
     CAN_write(cnf1_val, MCP_CNF1); //configurating CNF1 register
 
     uint8_t cnf2_val = BTLMODE | SAMPLE_1X | 0b00100000 | 0b00000000 ; //BTLMODE = 1, SAM = 0, PHseg1 = 5 - 1 = 4, PRSEG = 1 - 1 = 0
