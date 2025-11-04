@@ -7,10 +7,7 @@ void PWMinit(uint32_t mck) {
 
     //activate clock for the PWM- module in Power management controller 
     //Peripheral ID = 36 (PWM) --> PMC_PCER1 bit 4
-    PMC -> PMC_PCER1 =(1 << 4); //setting bit nr 4 high as it corresponds to 36
-
-    PMC -> PMC_PCER1 =(1 << 4); //setting bit nr 4 high as it corresponds to 36
-
+    PMC -> PMC_PCER1 = (1 << 4); //setting bit nr 4 high as it corresponds to 36
 
     //the motor shield (Servo sig) uses pb13 
     PMC -> PMC_PCER0 |= PMC_PCER0_PID12; //enables peripheral clock TC1 (timer counter channel 1)

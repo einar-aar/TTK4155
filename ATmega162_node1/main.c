@@ -108,7 +108,7 @@ int external_memory_init(void) {
 
     while(1) {
         sendJoystickPos();
-        _delay_ms(500);
+        _delay_ms(10);
 
     }
 
