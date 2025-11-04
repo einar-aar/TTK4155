@@ -102,9 +102,9 @@ float controller_output_to_duty_ratio(int contr_output) {
 
 
 
-void set_duty_cycle(CAN_MESSAGE* msg, uint32_t mck){ 
+void set_duty_cycle(int power, uint32_t mck){ 
 
-    float duty_ratio = controller_output_to_duty_ratio(msg -> data[0]); // testverdi
+    float duty_ratio = controller_output_to_duty_ratio(power); // testverdi
 
     //CDTY = duty_ratio*CPRD
     uint32_t CPRD = PWM->PWM_CH_NUM[1].PWM_CPRD;

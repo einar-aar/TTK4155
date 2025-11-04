@@ -68,12 +68,14 @@ int main()
     
     while (1)
     {
+        /*
         PIOB->PIO_SODR = (1u << 27);
         for (volatile int i = 0; i < 1000000; i++);
 
         // LED av
         PIOB->PIO_CODR = (1u << 27);
-        for (volatile int i = 0; i < 1000000; i++);
+        for (volatile int i = 0; i < 1000000; i++);*/
+        for (volatile int i = 0; i < 100000; i++);
         
         CAN_MESSAGE msg_rx;
         can_receive(&msg_rx, 0);
@@ -85,6 +87,7 @@ int main()
         ADC_values = scale_result(&msg_rx);
         printf("Scaled data received: %d %d %d %d\n\r", ADC_values[0], ADC_values[1], ADC_values[2], ADC_values[3]);
 
+        set_duty_cycle(ADC_values[0], F_CPU);
         free(ADC_values);
 
         fflush(stdout);
