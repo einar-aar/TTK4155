@@ -1,10 +1,13 @@
 #include <stdio.h>
 #include <stdarg.h>
+#include <string.h>
+
 #include "sam.h"
 #include "drivers/uart.h"
 #include "drivers/can_controller.h"
 #include "drivers/can_interrupt.h"
 #include "drivers/PWM.h"
+#include "drivers/adc.h"
 
 #define baud 9600
 #define F_CPU 84000000 // 84 MHz
@@ -44,6 +47,8 @@ int main()
 
     PWMinit(F_CPU);
 
+    ADC_init();
+
     /*// Test CAN
     CAN_MESSAGE msg;
 
@@ -65,6 +70,8 @@ int main()
 
     int* ADC_values = malloc(sizeof(int)*4);
     memset(ADC_values, 0, sizeof(int)*4);
+
+    int IR_value = 10;
     
     while (1)
     {
@@ -89,6 +96,9 @@ int main()
 
         set_duty_cycle(ADC_values[0], F_CPU);
         free(ADC_values);
+
+        IR_value = ADC_read();
+        printf("IR value: %d\n\r", IR_value);
 
         fflush(stdout);
     }
