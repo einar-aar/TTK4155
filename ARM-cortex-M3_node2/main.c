@@ -73,6 +73,8 @@ int main()
 
         can_receive(&msg_rx, 0);
 
+        //set_duty_cycle(&msg_rx, F_CPU);
+
         printf("Data received: %d %d %d %d\n\r", msg_rx.data[0], msg_rx.data[1], msg_rx.data[2], msg_rx.data[3]);
         fflush(stdout);
     }
