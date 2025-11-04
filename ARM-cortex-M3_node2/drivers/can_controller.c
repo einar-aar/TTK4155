@@ -16,6 +16,7 @@
 
 // #include "../uart_and_printf/printf-stdarg.h"
 
+#include <string.h>
 
 /**
  * \brief Initialize can bus with predefined number of rx and tx mailboxes, 
@@ -203,8 +204,67 @@ uint8_t can_receive(CAN_MESSAGE* can_msg, uint8_t rx_mb_id)
 		CAN0->CAN_MB[rx_mb_id].CAN_MCR |= CAN_MCR_MTCR;
 		return 0;
 	}
-	else //Mailbox busy
-	{
-		return 1;
-	}
+	
+	//Mailbox busy
+	return 1;
+}
+
+int* scale_result(CAN_MESSAGE* msg) {
+
+	const int joystick_x_center = 158; //center, max and min value for joystick x
+    const int joystick_x_min_val= 71;
+    const int joystick_x_max_val = 240;
+
+    const int joystick_y_center= 158; //center, max and min value for joystick y
+    const int joystick_y_min_val= 0;
+    const int joystick_y_max_val = 243;
+
+    const int touchpad_center = 157; //center, max and min value for touchpad 
+    const int touchpad_min_val= 0;
+    const int touchpad_max_val = 255;
+
+	int* result = malloc(sizeof(uint8_t)*4);
+    memset(result, 0, sizeof(uint8_t)*4);
+
+	for (int i = 0; i < 4; i++) {
+
+        int scaled = 0;
+
+        if (i == 0) {//x axis joystick
+            if (msg->data[0] < joystick_x_center) {
+                
+                scaled = (int) (((float)((msg->data[0]-joystick_x_center)*100)/(joystick_x_min_val-joystick_x_center)));
+            }
+            else {
+                scaled = (int) (((float)(msg->data[0]-joystick_x_center)/(joystick_x_max_val-joystick_x_center))*-100);
+            }
+        }
+
+        else if (i == 1) { //y_axis joystick
+            if (msg->data[1] < joystick_y_center) {
+                
+                scaled = (int) (((float)(msg->data[1]-joystick_y_center)/(joystick_y_min_val-joystick_y_center))*100/55*100);
+            }
+            else {
+                scaled = (int) (((float)(msg->data[1]-joystick_y_center)/(joystick_y_max_val-joystick_y_center))*-100);
+            }
+        }
+        else { //touchpad x and y axis
+            if (msg->data[i] < touchpad_center) {
+                
+                scaled = (int) (((float)(msg->data[i]-touchpad_center)/(touchpad_min_val-touchpad_center))*100);
+            }
+            else {
+                scaled = (int) (((float)(msg->data[i]-touchpad_center)/(touchpad_max_val-touchpad_center))*-100);
+            }
+        }
+
+        // limiting from [-100, 100]
+        if (scaled > 100) scaled = 100;
+        if (scaled < -100) scaled = -100;
+
+        result[i]= -scaled;
+    }
+
+	return result;
 }
