@@ -59,6 +59,9 @@ int main()
     // printf("Can message sent\n\r");
     */
     
+    CAN_MESSAGE msg_test;
+
+    set_duty_cycle(&msg_test, F_CPU);
     
     while (1)
     {

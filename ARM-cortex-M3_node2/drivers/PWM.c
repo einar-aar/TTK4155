@@ -34,7 +34,6 @@ void PWMinit(uint32_t mck) {
 
     //setting channel mode 
     uint32_t prescaler = 0b0111 ; //dividing MCK/128
-    uint32_t prescaler = 0b0111 ; //dividing MCK/128
     uint32_t CPOL = 0b1000000000; //setting channel polarity as high (=1)
     PWM -> PWM_CH_NUM[1].PWM_CMR = prescaler|CPOL ;
 
@@ -49,24 +48,7 @@ void PWMinit(uint32_t mck) {
     // T = (prescaler*CPRD)/ MCK --> CPRD = T*MCK/prescaler 
     int CPRD = 0.02*mck/128; //definert fra før av?
     PWM -> PWM_CH_NUM[1].PWM_CPRD = CPRD;
-    int CPRD = 0.02*mck/128; //definert fra før av?
-    PWM -> PWM_CH_NUM[1].PWM_CPRD = CPRD;
 
-    //seting duty cycle for channel (only init value, real value will be set as a function of controller output )
-    //duty cycle = (T- 1/f_channel*CDTY)/(T) , f_channel = mck/128
-
-    int CDTY = (CPRD/2); //
-    PWM -> PWM_CH_NUM[1].PWM_CDTY = CDTY;
-
-
-    PWM -> PWM_ENA = PWM_ENA_CHID1; //enabling PWM output for channel 1
-
-    PWM -> PWM_IER1 = PWM_IER1_CHID1; //enabling PWM interrupt on channel 1
-
-    //active write protection
-    PWM -> PWM_WPCR |= 1;
-
-    return;
     //seting duty cycle for channel (only init value, real value will be set as a function of controller output )
     //duty cycle = (T- 1/f_channel*CDTY)/(T) , f_channel = mck/128
 
