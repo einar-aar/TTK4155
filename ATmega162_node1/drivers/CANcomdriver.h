@@ -6,7 +6,7 @@ typedef struct  {
 
     uint32_t id; //message identifier, (11-bits or 29 bits depending on frame (standard/extended))
     uint8_t dlc; //data length code: 0-4
-    uint8_t data[8]; //data bytes
+    int data[8]; //data bytes
 
 }CAN_FRAME;
 

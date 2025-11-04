@@ -72,7 +72,7 @@ void PWMinit(uint32_t mck) {
 
 int controller_output_to_duty_cycle(int contr_output) {
     
-    const int contr_output_max = 0; //what is the range of the controller output?
+    const int contr_output_max = 252; //what is the range of the controller output?
     const int contr_output_min = 0; 
 
     int pwm_max = 0.0021;
