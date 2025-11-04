@@ -24,6 +24,8 @@ void sendJoystickPos() {
     msg_send.data[2] = ADC_values[2];
     msg_send.data[3] = ADC_values[3];
 
+    printf("Data sent: %d %d %d %d\n\r", msg_send.data[0], msg_send.data[1], msg_send.data[2], msg_send.data[3]);
+
     CAN_transmit_message(msg_send, 0);
     printf("CAN message sent\n\r");
     

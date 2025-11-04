@@ -70,16 +70,16 @@ void PWMinit(uint32_t mck) {
 
 //takes in joystick_pos in x direction and calculates duty cycle 
 
-int controller_output_to_duty_cycle(int contr_output) {
+uint32_t controller_output_to_duty_cycle(int contr_output) {
     
     const int contr_output_max = 252; //what is the range of the controller output?
     const int contr_output_min = 0; 
 
-    int pwm_max = 0.0021;
-    int pwm_min = 0.0009;
+    uint32_t pwm_max = 0.0021;
+    uint32_t pwm_min = 0.0009;
 
     //scaling duty cycle according to input range
-    int duty_cycle = pwm_min + (contr_output - contr_output_min) * (pwm_max - pwm_min) / (contr_output_max - contr_output_min);
+    uint32_t duty_cycle = pwm_min + (contr_output - contr_output_min) * (pwm_max - pwm_min) / (contr_output_max - contr_output_min);
 
     //making shure the duty sycle stays within range
     if(duty_cycle > pwm_max) {
@@ -103,11 +103,11 @@ void set_duty_cycle(CAN_MESSAGE* msg, uint32_t mck){
 
     //duty cycle = (T- 1/f_channel*CDTY)/(T) , f_channel = mck/128
     // -> CDTY = -T*duty_cycle*f_channel + T*f_channel
-    int f_channel = mck/128;
-    int T= 0.02;
-    int duty_cycle = controller_output_to_duty_cycle(100);
+    uint32_t f_channel = mck/128;
+    uint32_t T= 0.02;
+    uint32_t duty_cycle = controller_output_to_duty_cycle(100);
 
-    int CDTY = T*f_channel-T*f_channel*duty_cycle;
+    uint32_t CDTY = T*f_channel-T*f_channel*duty_cycle;
 
     PWM -> PWM_CH_NUM[1].PWM_CDTY = CDTY;
 
