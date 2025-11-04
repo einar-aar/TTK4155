@@ -91,13 +91,13 @@ int external_memory_init(void) {
     printf("ADC-verdi: %02X\n\n\r", value);
 
     _delay_ms(50);*/
-
-    /*int* ADC_values = malloc(sizeof(int)*4);
+    /*
+    int* ADC_values = malloc(sizeof(int)*4);
     memset(ADC_values, 0, sizeof(int)*4);
 
     while (1) {
         
-        ADC_values = ADC_read();
+        ADC_values = ADC_read_joystick_and_pad();
         printf("Joystick_x: %d, joystick_y: %d, touchpad_x: %d, touchpad_y: %d\n\r", ADC_values[1], ADC_values[0], ADC_values[2], ADC_values[3]);
         free(ADC_values);
     }*/

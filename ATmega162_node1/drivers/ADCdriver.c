@@ -59,10 +59,15 @@ int* ADC_read_joystick_and_pad(void) {
     // Put CH0, 1, 2 and 3 in array result
     for (int i = 0; i < 4; i++) {
 
-         int original_value = *ADC;
-         int scaled = 0;
+        int original_value = *ADC;
+        int scaled = 0;
 
-         if (i == 1) {//x axis joystick
+        if (i == 1) result[0] = original_value;
+        else if (i == 0) result[1] = original_value;
+        else result[i] = original_value; 
+        
+        /*
+        if (i == 1) {//x axis joystick
             if (original_value < joystick_x_center) {
                 
                 scaled = (int) (((float)((original_value-joystick_x_center)*100)/(joystick_x_min_val-joystick_x_center)));
@@ -70,9 +75,9 @@ int* ADC_read_joystick_and_pad(void) {
             else {
                 scaled = (int) (((float)(original_value-joystick_x_center)/(joystick_x_max_val-joystick_x_center))*-100);
             }
-         }
+        }
 
-         else if (i == 0) { //y_axis joystick
+        else if (i == 0) { //y_axis joystick
             if (original_value < joystick_y_center) {
                 
                 scaled = (int) (((float)(original_value-joystick_y_center)/(joystick_y_min_val-joystick_y_center))*100/55*100);
@@ -80,8 +85,8 @@ int* ADC_read_joystick_and_pad(void) {
             else {
                 scaled = (int) (((float)(original_value-joystick_y_center)/(joystick_y_max_val-joystick_y_center))*-100);
             }
-         }
-         else { //touchpad x and y axis
+        }
+        else { //touchpad x and y axis
             if (original_value < touchpad_center) {
                 
                 scaled = (int) (((float)(original_value-touchpad_center)/(touchpad_min_val-touchpad_center))*100);
@@ -89,15 +94,14 @@ int* ADC_read_joystick_and_pad(void) {
             else {
                 scaled = (int) (((float)(original_value-touchpad_center)/(touchpad_max_val-touchpad_center))*-100);
             }
-         }  
+        }
 
-        
 
         // limiting from [-100, 100]
         if (scaled > 100) scaled = 100;
         if (scaled < -100) scaled = -100;
 
-        result[i]= -scaled;
+        result[i] = -scaled;*/
     }
 
     SPI_release_slave();

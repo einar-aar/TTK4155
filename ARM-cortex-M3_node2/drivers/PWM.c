@@ -61,7 +61,7 @@ void PWMinit(uint32_t mck) {
     PWM -> PWM_IER1 = PWM_IER1_CHID1; //enabling PWM interrupt on channel 1
 
     //active write protection
-    PWM -> PWM_WPCR |= 1;
+    PWM -> PWM_WPCR = (0x50574D << 8) | (0b11011100) |(1<<0); //enabling write protect for everything but the period and duty_cycle registers
 
     return;
 
@@ -70,29 +70,33 @@ void PWMinit(uint32_t mck) {
 
 //takes in joystick_pos in x direction and calculates duty cycle 
 
-uint32_t controller_output_to_duty_cycle(int contr_output) {
+
+float controller_output_to_duty_ratio(int contr_output) {
     
-    const int contr_output_max = 252; //what is the range of the controller output?
-    const int contr_output_min = 0; 
+    const int contr_output_max = 100; //what is the range of the controller output?
+    const int contr_output_min = -100; 
 
-    uint32_t pwm_max = 0.0021;
-    uint32_t pwm_min = 0.0009;
+    const float duty_min = 0.045f;       //  0.9 ms / 20 ms ≈ 4.5 %
+    const float duty_max = 0.105f;       //  2.1 ms / 20 ms ≈ 10.5 %
 
-    //scaling duty cycle according to input range
-    uint32_t duty_cycle = pwm_min + (contr_output - contr_output_min) * (pwm_max - pwm_min) / (contr_output_max - contr_output_min);
 
     //making shure the duty sycle stays within range
-    if(duty_cycle > pwm_max) {
+    if(contr_output > contr_output_max) {
 
-        duty_cycle = pwm_max;
+        contr_output = contr_output_max;
 
-    }else if (duty_cycle < pwm_min){
+    }else if (contr_output < contr_output_min){
 
-        duty_cycle = pwm_min;
+        contr_output = contr_output_min;
 
     }
 
-    return duty_cycle;
+    //linear scaling from contr output to duty_ratio
+    float t = (float)(contr_output - contr_output_min) /(float)(contr_output_max - contr_output_min);
+
+    float duty_ratio = duty_min + t * (duty_max - duty_min);
+
+    return duty_ratio;
 
 }
 
@@ -100,15 +104,17 @@ uint32_t controller_output_to_duty_cycle(int contr_output) {
 
 void set_duty_cycle(CAN_MESSAGE* msg, uint32_t mck){ 
 
+    float duty_ratio = controller_output_to_duty_ratio(msg -> data[0]); // testverdi
 
-    //duty cycle = (T- 1/f_channel*CDTY)/(T) , f_channel = mck/128
-    // -> CDTY = -T*duty_cycle*f_channel + T*f_channel
-    uint32_t f_channel = mck/128;
-    uint32_t T= 0.02;
-    uint32_t duty_cycle = controller_output_to_duty_cycle(100);
+    //CDTY = duty_ratio*CPRD
+    uint32_t CPRD = PWM->PWM_CH_NUM[1].PWM_CPRD;
 
-    uint32_t CDTY = T*f_channel-T*f_channel*duty_cycle;
+    //uint32_t CDTYmax = (uint32_t)(0.105 * (float)CPRD);// calculating max and min 
 
-    PWM -> PWM_CH_NUM[1].PWM_CDTY = CDTY;
+    uint32_t CDTY_val = (uint32_t)(duty_ratio * (float)CPRD);    
+    //uint32_t CDTY_val = CPRD/8;
 
+    //setting duty_cycle
+    PWM->PWM_CH_NUM[1].PWM_CDTYUPD = CDTY_val;
+    
 }

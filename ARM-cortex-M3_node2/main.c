@@ -59,9 +59,12 @@ int main()
     // printf("Can message sent\n\r");
     */
     
-    CAN_MESSAGE msg_test;
+    //CAN_MESSAGE msg_test;
 
-    set_duty_cycle(&msg_test, F_CPU);
+    //set_duty_cycle(&msg_test, F_CPU);
+
+    int* ADC_values = malloc(sizeof(int)*4);
+    memset(ADC_values, 0, sizeof(int)*4);
     
     while (1)
     {
@@ -73,12 +76,17 @@ int main()
         for (volatile int i = 0; i < 1000000; i++);
         
         CAN_MESSAGE msg_rx;
-
         can_receive(&msg_rx, 0);
 
         //set_duty_cycle(&msg_rx, F_CPU);
 
-        printf("Data received: %d %d %d %d\n\r", msg_rx.data[0], msg_rx.data[1], msg_rx.data[2], msg_rx.data[3]);
+        //printf("Data received: %d %d %d %d\n\r", msg_rx.data[0], msg_rx.data[1], msg_rx.data[2], msg_rx.data[3]);
+
+        ADC_values = scale_result(&msg_rx);
+        printf("Scaled data received: %d %d %d %d\n\r", ADC_values[0], ADC_values[1], ADC_values[2], ADC_values[3]);
+
+        free(ADC_values);
+
         fflush(stdout);
     }
     

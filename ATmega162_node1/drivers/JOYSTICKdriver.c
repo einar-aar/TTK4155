@@ -7,10 +7,10 @@
 
 void sendJoystickPos() {
 
-    ADC[0]=0x04;
+    /*ADC[0]=0x04;
     uint8_t value = ADC[0];
 
-    _delay_ms(50);
+    _delay_ms(50);*/
 
     int* ADC_values = malloc(sizeof(int)*4);
     memset(ADC_values, 0, sizeof(int)*4);
@@ -24,6 +24,9 @@ void sendJoystickPos() {
     msg_send.data[2] = ADC_values[2];
     msg_send.data[3] = ADC_values[3];
 
+    fflush(stdout);
+
+    printf("Data read: %d %d %d %d\n\r", ADC_values[1], ADC_values[0], ADC_values[2], ADC_values[3]);
     printf("Data sent: %d %d %d %d\n\r", msg_send.data[0], msg_send.data[1], msg_send.data[2], msg_send.data[3]);
 
     CAN_transmit_message(msg_send, 0);
