@@ -9,6 +9,8 @@ void PWMinit(uint32_t mck) {
     //Peripheral ID = 36 (PWM) --> PMC_PCER1 bit 4
     PMC -> PMC_PCER1 =(1 << 4); //setting bit nr 4 high as it corresponds to 36
 
+    PMC -> PMC_PCER1 =(1 << 4); //setting bit nr 4 high as it corresponds to 36
+
 
     //the motor shield (Servo sig) uses pb13 
     PMC -> PMC_PCER0 |= PMC_PCER0_PID12; //enables peripheral clock TC1 (timer counter channel 1)
@@ -32,7 +34,11 @@ void PWMinit(uint32_t mck) {
 
     //setting channel mode 
     uint32_t prescaler = 0b0111 ; //dividing MCK/128
+    uint32_t prescaler = 0b0111 ; //dividing MCK/128
     uint32_t CPOL = 0b1000000000; //setting channel polarity as high (=1)
+    PWM -> PWM_CH_NUM[1].PWM_CMR = prescaler|CPOL ;
+
+    PWM -> PWM_CH_NUM[1].PWM_CMR &= ~(1<<10); //setting CES = 0 The channel counter is clocked by the prescaler output
     PWM -> PWM_CH_NUM[1].PWM_CMR = prescaler|CPOL ;
 
     PWM -> PWM_CH_NUM[1].PWM_CMR &= ~(1<<10); //setting CES = 0 The channel counter is clocked by the prescaler output
@@ -43,7 +49,24 @@ void PWMinit(uint32_t mck) {
     // T = (prescaler*CPRD)/ MCK --> CPRD = T*MCK/prescaler 
     int CPRD = 0.02*mck/128; //definert fra før av?
     PWM -> PWM_CH_NUM[1].PWM_CPRD = CPRD;
+    int CPRD = 0.02*mck/128; //definert fra før av?
+    PWM -> PWM_CH_NUM[1].PWM_CPRD = CPRD;
 
+    //seting duty cycle for channel (only init value, real value will be set as a function of controller output )
+    //duty cycle = (T- 1/f_channel*CDTY)/(T) , f_channel = mck/128
+
+    int CDTY = (CPRD/2); //
+    PWM -> PWM_CH_NUM[1].PWM_CDTY = CDTY;
+
+
+    PWM -> PWM_ENA = PWM_ENA_CHID1; //enabling PWM output for channel 1
+
+    PWM -> PWM_IER1 = PWM_IER1_CHID1; //enabling PWM interrupt on channel 1
+
+    //active write protection
+    PWM -> PWM_WPCR |= 1;
+
+    return;
     //seting duty cycle for channel (only init value, real value will be set as a function of controller output )
     //duty cycle = (T- 1/f_channel*CDTY)/(T) , f_channel = mck/128
 
@@ -100,7 +123,7 @@ void set_duty_cycle(CAN_MESSAGE* msg, uint32_t mck){
     // -> CDTY = -T*duty_cycle*f_channel + T*f_channel
     int f_channel = mck/128;
     int T= 0.02;
-    int duty_cycle = controller_output_to_duty_cycle(msg->data[0]);
+    int duty_cycle = controller_output_to_duty_cycle(100);
 
     int CDTY = T*f_channel-T*f_channel*duty_cycle;
 
