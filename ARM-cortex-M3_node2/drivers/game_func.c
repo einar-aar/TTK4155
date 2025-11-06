@@ -5,6 +5,6 @@
 
 uint8_t score() {
 
-    if (ADC_read() < 1500) return 1;
+    if (ADC_read() < 500) return 1;
     else return 0;
 }

@@ -9,7 +9,7 @@ void ADC_init() {
     ADC->ADC_MR |= (1 << 7);
 
     // Enable chanel register
-    ADC->ADC_CHER |= (1 << 0);
+    ADC->ADC_CHER |= (1 << 0); // Enable channel 0
 
     // Activate clock for ADC
     PMC->PMC_PCR |= (1 << 28) | (37 << 0); // Set enable bit, leave DIV unset to use MCK as clock, leave CMD unset to enable read and set PID for ADC
