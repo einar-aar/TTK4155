@@ -11,16 +11,16 @@ void solenoid_init() {
 
     PIOB->PIO_OER |= (1 << SOLENOID_PIN); // Activate output
 
-    PIOB->PIO_CODR |= (1 << SOLENOID_PIN); // Clear output register 
+    PIOB->PIO_SODR |= (1 << SOLENOID_PIN); // Clear output register
 }
 
 void solenoid_activate() {
 
-    PIOB->PIO_SODR |= (1 << SOLENOID_PIN); // Set pin high
+    PIOB->PIO_CODR |= (1 << SOLENOID_PIN); // Set pin low, logic high
 
 }
 
 void solenoid_deactivate() {
 
-    PIOB->PIO_CODR |= (1 << SOLENOID_PIN); // Deactivate pin
+    PIOB->PIO_SODR |= (1 << SOLENOID_PIN); // Set pin high, logic low
 }

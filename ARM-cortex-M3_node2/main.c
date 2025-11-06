@@ -77,18 +77,17 @@ int main()
 
     int IR_value = 10;
     int old_x_value = 0;
-    
+
     while (1)
     {
-        solenoid_deactivate();
-        
+        /*
         PIOB->PIO_SODR = (1u << 27);
         for (volatile int i = 0; i < 1000000; i++);
 
         // LED av
         PIOB->PIO_CODR = (1u << 27);
-        for (volatile int i = 0; i < 1000000; i++);
-        for (volatile int i = 0; i < 500000; i++);
+        for (volatile int i = 0; i < 1000000; i++);*/
+        for (volatile int i = 0; i < 100000; i++);
         
         CAN_MESSAGE msg_rx;
         can_receive(&msg_rx, 0);
@@ -100,10 +99,10 @@ int main()
         ADC_values = scale_result(&msg_rx);
         //printf("Scaled data received: %d %d %d %d %d\n\r", ADC_values[0], ADC_values[1], ADC_values[2], ADC_values[3], ADC_values[4]);
 
-        if (ADC_values[0] >= old_x_value - 1 && ADC_values[0] <= old_x_value + 1);
-        else set_duty_cycle(ADC_values[0], F_CPU);
+        if (ADC_values[1] >= old_x_value - 1 && ADC_values[1] <= old_x_value + 1);
+        else set_duty_cycle(ADC_values[1], F_CPU);
         
-        old_x_value = ADC_values[0];
+        old_x_value = ADC_values[1];
         
         /*IR_value = ADC_read();
         printf("IR value: %d\n\r", IR_value);*/
@@ -114,11 +113,9 @@ int main()
             printf("Goals: %d\n\r", goals);
         }
 
-        if (ADC_values[4] == 1) {
-            
-            printf("Solenoid activated\n\r");
-            solenoid_activate();
-        }
+        if (ADC_values[4] == 1) solenoid_activate();
+
+        if (ADC_values[4] == 0) solenoid_deactivate();
 
         fflush(stdout);
         free(ADC_values);
