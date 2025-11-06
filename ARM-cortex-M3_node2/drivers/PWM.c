@@ -7,7 +7,8 @@ void PWMinit(uint32_t mck) {
 
     //activate clock for the PWM- module in Power management controller 
     //Peripheral ID = 36 (PWM) --> PMC_PCER1 bit 4
-    PMC -> PMC_PCER1 = (1 << 4); //setting bit nr 4 high as it corresponds to 36
+    PMC -> PMC_PCER1 = (1 << 4); //setting bit nr 4 high as it corresponds to 36. Setting clk for PWM
+    PMC -> PMC_PCER0 |= (1u << ID_PIOB); // Set clk for PIOB
 
     //the motor shield (Servo sig) uses pb13 
     PMC -> PMC_PCER0 |= PMC_PCER0_PID12; //enables peripheral clock TC1 (timer counter channel 1)
@@ -63,12 +64,12 @@ void PWMinit(uint32_t mck) {
     PWM -> PWM_CH_NUM[0].PWM_CDTY = CDTY;
 
 
-    PWM -> PWM_ENA = PWM_ENA_CHID1; //enabling PWM output for channel 1
-    PWM -> PWM_ENA = PWM_ENA_CHID0; //enabling PWM output for channel 0
+    PWM -> PWM_ENA |= PWM_ENA_CHID1; //enabling PWM output for channel 1
+    PWM -> PWM_ENA |= PWM_ENA_CHID0; //enabling PWM output for channel 0
 
 
-    PWM -> PWM_IER1 = PWM_IER1_CHID1; //enabling PWM interrupt on channel 1
-    PWM -> PWM_IER1 = PWM_IER1_CHID0; //enabling PWM interrupt on channel 1
+    PWM -> PWM_IER1 |= PWM_IER1_CHID1; //enabling PWM interrupt on channel 1
+    PWM -> PWM_IER1 |= PWM_IER1_CHID0; //enabling PWM interrupt on channel 0
  
 
     //active write protection

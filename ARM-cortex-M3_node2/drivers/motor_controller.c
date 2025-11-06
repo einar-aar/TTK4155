@@ -8,46 +8,39 @@
 void encoder_init() {
     //activate clock for the Timer counter- module in Power management controller 
     //Peripheral ID = 29 (PWM) --> PMC_PCER0 bit 4
-    PMC -> PMC_PCER0 =(1 << 29); //setting bit nr 29 high as it corresponds to 29
-    PMC->PMC_PCER0 |= (1 << ID_PIOC); // Activate clock for PIOC
-
-
-    PIOC -> PIO_PDR |= PIO_PDR_P25; ////deactivating PIO, opening pin PC25&PC26 for perihperal
-    PIOC -> PIO_PDR |= PIO_PDR_P26;
-    PIOC -> PIO_ABSR |= PIO_ABSR_P25; //setting peripheral function B at pin PC25
-    PIOC -> PIO_ABSR |= PIO_ABSR_P26; //setting peripheral function B at pin PC26
-
-
+    PMC -> PMC_PCER0 |= PMC_PCER0_PID29; //setting bit nr 29 high as it corresponds to 29
+    PIOC ->PIO_PDR |= (PIO_PC25 | PIO_PC26); //deactivating PIO, opening pin PC25&PC26 for perihperal
+    PIOC -> PIO_ABSR |= (PIO_PC25 | PIO_PC26); //setting peripheral function B at pin PC25&26
+    
+    //PMC->PMC_PCER0 |= (1 << ID_PIOC); // Activate clock for PIOC
 
     //deactivating write protection
     TC2 -> TC_WPMR = (0x54494D << 8); //WPKEY =0x54494D 
 
+    TC2->TC_CHANNEL[0].TC_CMR &= ~TC_CMR_WAVE; //enable capture mode
+    TC2->TC_CHANNEL[0].TC_CMR |= TC_CMR_TCCLKS_XC0; //setting XC0 as clock
+    TC2->TC_CHANNEL[0].TC_CMR |= TC_CMR_ETRGEDG_RISING; //triggering edge
+    TC2->TC_CHANNEL[0].TC_CMR |= TC_CMR_ABETRG; //aetting external trigger as TIOA
+
     //setting block mode register
-    uint32_t bmr = 0;
-    bmr = (1<<8) | (1<<9) | (1<<0);  //activating quadrature mode and enabling postition on channel 0
-    TC2->TC_BMR = bmr;
+    TC2->TC_BMR = 0;
+    TC2->TC_BMR |= TC_BMR_QDEN;
+    TC2->TC_BMR |= TC_BMR_POSEN;
+    TC2->TC_BMR |= TC_BMR_EDGPHA;
+    PMC -> PMC_PCER0 |=PMC_PCER0_PID12;
 
-    //selecting clock for channel 0
-    TC2->TC_CHANNEL[0].TC_CMR = 0b101; //selcting clock XC0
+    //starting timer counter 2 (TC2)
+    TC2 -> TC_CHANNEL[0].TC_CCR |= (TC_CCR_CLKEN | TC_CCR_SWTRG);
 
-    //enabling channel 0
-    TC2->TC_CHANNEL[0].TC_CCR = (1<<0) | (1<<2);
-
-    // ENABLE DIRECTION CONTROLL
-
-    PIOC->PIO_PER |= (1 << MOTOR_DIRECTION_PIN); // Activate control over pin C23
-
-    PIOC->PIO_OER |= (1 << MOTOR_DIRECTION_PIN); // Activate output
-
-    PIOC->PIO_CODR |= (1 << MOTOR_DIRECTION_PIN); // Clear output register
-
-    //activatining write protection
+    //reactivating write protection
+    TC2 -> TC_WPMR = ((0x54494D << 8) | 1);
 
 }
 
-int get_encoder_pos() {
+/*
+uint32_t get_encoder_pos(void) {
     return (TC2 -> TC_CHANNEL[0].TC_CV);
-}
+}*/
 
 
 void set_motor_dir(int joystick_value) {
