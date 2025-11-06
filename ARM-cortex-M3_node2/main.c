@@ -77,18 +77,17 @@ int main()
 
     int IR_value = 10;
     int old_x_value = 0;
-    
+
     while (1)
     {
-        solenoid_deactivate();
-        
+        /*
         PIOB->PIO_SODR = (1u << 27);
         for (volatile int i = 0; i < 1000000; i++);
 
         // LED av
         PIOB->PIO_CODR = (1u << 27);
-        for (volatile int i = 0; i < 1000000; i++);
-        for (volatile int i = 0; i < 500000; i++);
+        for (volatile int i = 0; i < 1000000; i++);*/
+        for (volatile int i = 0; i < 100000; i++);
         
         CAN_MESSAGE msg_rx;
         can_receive(&msg_rx, 0);
@@ -119,6 +118,8 @@ int main()
             printf("Solenoid activated\n\r");
             solenoid_activate();
         }
+
+        if (ADC_values[4] == 0) solenoid_deactivate();
 
         fflush(stdout);
         free(ADC_values);
