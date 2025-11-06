@@ -4,6 +4,7 @@
 
 #define MOTOR_DIRECTION_PIN 23
 #define F_CPU 84000000
+#define F_CPU 84000000
 
 void encoder_init() {
     //activate clock for the Timer counter- module in Power management controller 
