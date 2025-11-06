@@ -117,6 +117,8 @@ int main()
 
         if (ADC_values[4] == 0) solenoid_deactivate();
 
+        if (ADC_values[4] == 0) solenoid_deactivate();
+
         fflush(stdout);
         free(ADC_values);
     }
