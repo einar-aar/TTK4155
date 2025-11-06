@@ -223,8 +223,8 @@ int* scale_result(CAN_MESSAGE* msg) {
     const int touchpad_min_val= 0;
     const int touchpad_max_val = 255;
 
-	int* result = malloc(sizeof(int)*4);
-    memset(result, 0, sizeof(int)*4);
+	int* result = malloc(sizeof(int)*5);
+    memset(result, 0, sizeof(int)*5);
 
 	for (int i = 0; i < 4; i++) {
 
@@ -265,6 +265,7 @@ int* scale_result(CAN_MESSAGE* msg) {
 
         result[i]= -scaled;
     }
+	result[4] = msg->data[4];
 
 	return result;
 }

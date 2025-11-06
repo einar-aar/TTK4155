@@ -70,8 +70,8 @@ int main()
 
     //set_duty_cycle(&msg_test, F_CPU);
 
-    int* ADC_values = malloc(sizeof(int)*4);
-    memset(ADC_values, 0, sizeof(int)*4);
+    int* ADC_values = malloc(sizeof(int)*5);
+    memset(ADC_values, 0, sizeof(int)*5);
 
     int IR_value = 10;
     int old_x_value = 0;
@@ -95,7 +95,7 @@ int main()
         //printf("Data received: %d %d %d %d\n\r", msg_rx.data[0], msg_rx.data[1], msg_rx.data[2], msg_rx.data[3]);
 
         ADC_values = scale_result(&msg_rx);
-        //printf("Scaled data received: %d %d %d %d\n\r", ADC_values[0], ADC_values[1], ADC_values[2], ADC_values[3]);
+        printf("Scaled data received: %d %d %d %d %d\n\r", ADC_values[0], ADC_values[1], ADC_values[2], ADC_values[3], ADC_values[4]);
 
         if (ADC_values[0] >= old_x_value - 1 && ADC_values[0] <= old_x_value + 1);
         else set_duty_cycle(ADC_values[0], F_CPU);
@@ -105,8 +105,8 @@ int main()
         free(ADC_values);
 
         
-        IR_value = ADC_read();
-        printf("IR value: %d\n\r", IR_value);
+        /*IR_value = ADC_read();
+        printf("IR value: %d\n\r", IR_value);*/
 
         if (score()) {
             

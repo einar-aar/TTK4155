@@ -138,5 +138,5 @@ void ADC_read_IO_module(uint8_t right_buttons[6], uint8_t left_buttons[7], uint8
 // Read joystick button
 uint8_t read_joystick_button(void) {
 
-    return (PINB & (1 << Joystick_btn) ? 1 : 0);
+    return (PINB & (1 << Joystick_btn) ? 0 : 1); // 1 When pressed
 }

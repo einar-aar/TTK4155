@@ -12,22 +12,24 @@ void sendJoystickPos() {
 
     _delay_ms(50);*/
 
-    int* ADC_values = malloc(sizeof(int)*4);
-    memset(ADC_values, 0, sizeof(int)*4);
+    int* ADC_values = malloc(sizeof(int)*5);
+    memset(ADC_values, 0, sizeof(int)*5);
     ADC_values = ADC_read_joystick_and_pad();
+    ADC_values[4] = read_joystick_button();
 
     CAN_FRAME msg_send;
     msg_send.id = (uint32_t)0b00000001;
-    msg_send.dlc = 4;
+    msg_send.dlc = 5;
     msg_send.data[0] = ADC_values[1];
     msg_send.data[1] = ADC_values[0];
     msg_send.data[2] = ADC_values[2];
     msg_send.data[3] = ADC_values[3];
+    msg_send.data[4] = ADC_values[4];
 
     fflush(stdout);
 
-    printf("Data read: %d %d %d %d\n\r", ADC_values[1], ADC_values[0], ADC_values[2], ADC_values[3]);
-    printf("Data sent: %d %d %d %d\n\r", msg_send.data[0], msg_send.data[1], msg_send.data[2], msg_send.data[3]);
+    printf("Data read: %d %d %d %d %d\n\r", ADC_values[1], ADC_values[0], ADC_values[2], ADC_values[3], ADC_values[4]);
+    printf("Data sent: %d %d %d %d %d\n\r", msg_send.data[0], msg_send.data[1], msg_send.data[2], msg_send.data[3], msg_send.data[4]);
 
     CAN_transmit_message(msg_send, 0);
     printf("CAN message sent\n\r");
