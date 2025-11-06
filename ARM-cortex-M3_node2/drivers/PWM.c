@@ -115,7 +115,7 @@ float controller_output_to_duty_ratio(int contr_output) {
 
 void set_duty_cycle(int power, uint32_t mck, int channel){ 
     //channel 0 = motor driver (joystick xpos)
-    //channel 0 = servo (joystick y_pos)
+    //channel 1 = servo (joystick y_pos)
     if (channel != 0 | 1) {
         printf("invalid channel choice");
         return;

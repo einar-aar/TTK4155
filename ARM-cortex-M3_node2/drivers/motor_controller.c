@@ -3,6 +3,7 @@
 #include "PWM.h"
 
 #define MOTOR_DIRECTION_PIN 23
+#define F_CPU 84000000
 
 void encoder_init() {
     //activate clock for the Timer counter- module in Power management controller 
@@ -44,5 +45,5 @@ void set_motor_dir(int joystick_value) {
 void set_motor_pos(int joystick_value) {
 
     set_motor_dir(joystick_value);
-    
+    set_duty_cycle(joystick_value, F_CPU, 0);
 }
