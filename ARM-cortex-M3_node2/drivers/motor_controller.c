@@ -37,6 +37,8 @@ void encoder_init() {
 
 }
 
+
+
 /*
 uint32_t get_encoder_pos(void) {
     return (TC2 -> TC_CHANNEL[0].TC_CV);
