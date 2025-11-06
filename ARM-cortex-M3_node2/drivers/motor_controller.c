@@ -17,6 +17,7 @@ void encoder_init() {
     PIOC -> PIO_ABSR |= PIO_ABSR_P25; //setting peripheral function B at pin PC25
     PIOC -> PIO_ABSR |= PIO_ABSR_P26; //setting peripheral function B at pin PC26
 
+    PMC->PMC_PCER0 |= (1 << ID_PIOC); // Activate clock for PIOC
 
 
     //deactivating write protection
