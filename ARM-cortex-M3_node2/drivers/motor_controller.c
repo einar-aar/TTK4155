@@ -1,4 +1,7 @@
+#include "motor_controller.h"
+#include "sam.h"
 
+#define MOTOR_DIRECTION_PIN 23
 
 void encoder_init() {
     //activate clock for the Timer counter- module in Power management controller 
@@ -20,4 +23,21 @@ void encoder_init() {
     //enabling channel 0
     TC2->TC_CHANNEL[0].TC_CCR = 0b1;
 
+    // ENABLE DIRECTION CONTROLL
+    PMC->PMC_PCER0 |= (1 << ID_PIOC); // Activate clock for PIOC
+
+    PIOC->PIO_PER |= (1 << MOTOR_DIRECTION_PIN); // Activate control over pin C23
+
+    PIOC->PIO_OER |= (1 << MOTOR_DIRECTION_PIN); // Activate output
+
+    PIOC->PIO_CODR |= (1 << MOTOR_DIRECTION_PIN); // Clear output register
+
 }
+
+void set_motor_dir(int joystick_value) {
+
+    if (joystick_value < 0) PIOC->PIO_CODR |= (1 << MOTOR_DIRECTION_PIN);
+    else PIOC->PIO_SODR |= (1 << MOTOR_DIRECTION_PIN);
+}
+
+void 
