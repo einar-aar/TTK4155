@@ -1,10 +1,24 @@
 #include "game_func.h"
 #include "adc.h"
+#include "sam.h"
+#include <stdint.h>
+#include <time.h>
 
-
+// uint32_t last_goal_time = 0;
+bool register_goal = true; // If the IR led is not blocked, we get a value higher than 3000. If blocked, we get around 0 - 50.
 
 uint8_t score() {
 
-    if (ADC_read() < 1500) return 1;
-    else return 0;
+    if (ADC_read() < 500 && register_goal) {
+        
+        register_goal = false;
+        return 1;
+    }
+
+    if (ADC_read() > 1500) register_goal = true;
+    
+    return 0;
+
 }
+// (time_now() / ticksPerMs() - last_goal_time) > 500
+// last_goal_time = time_now() / ticksPerMs();

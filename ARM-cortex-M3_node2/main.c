@@ -22,6 +22,8 @@
  */
 //#include "../path_to/uart.h"
 
+int goals = 0;
+
 int main()
 
 {
@@ -83,7 +85,7 @@ int main()
         // LED av
         PIOB->PIO_CODR = (1u << 27);
         for (volatile int i = 0; i < 1000000; i++);*/
-        for (volatile int i = 0; i < 100000; i++);
+        for (volatile int i = 0; i < 500000; i++);
         
         CAN_MESSAGE msg_rx;
         can_receive(&msg_rx, 0);
@@ -93,7 +95,7 @@ int main()
         //printf("Data received: %d %d %d %d\n\r", msg_rx.data[0], msg_rx.data[1], msg_rx.data[2], msg_rx.data[3]);
 
         ADC_values = scale_result(&msg_rx);
-        printf("Scaled data received: %d %d %d %d\n\r", ADC_values[0], ADC_values[1], ADC_values[2], ADC_values[3]);
+        //printf("Scaled data received: %d %d %d %d\n\r", ADC_values[0], ADC_values[1], ADC_values[2], ADC_values[3]);
 
         if (ADC_values[0] >= old_x_value - 1 && ADC_values[0] <= old_x_value + 1);
         else set_duty_cycle(ADC_values[0], F_CPU);
@@ -102,10 +104,16 @@ int main()
 
         free(ADC_values);
 
+        
         IR_value = ADC_read();
         printf("IR value: %d\n\r", IR_value);
 
+        if (score()) {
+            
+            goals++;
+            printf("Goals: %d\n\r", goals);
+        }
+
         fflush(stdout);
     }
-    
 }

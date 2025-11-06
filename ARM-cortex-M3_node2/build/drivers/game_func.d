@@ -72,4 +72,4 @@ build/drivers/game_func.o: drivers/game_func.c drivers/game_func.h \
  sam/sam3x/include/instance/instance_wdt.h \
  sam/sam3x/include/instance/instance_rtc.h \
  sam/sam3x/include/instance/instance_gpbr.h \
- sam/sam3x/include/pio/pio_sam3x8e.h drivers/adc.h
+ sam/sam3x/include/pio/pio_sam3x8e.h drivers/adc.h drivers/time.h
