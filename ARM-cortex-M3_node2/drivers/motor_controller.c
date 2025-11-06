@@ -15,10 +15,14 @@ void encoder_init() {
     PIOC -> PIO_ABSR |= PIO_ABSR_P25; //setting peripheral function B at pin PC25
     PIOC -> PIO_ABSR |= PIO_ABSR_P26; //setting peripheral function B at pin PC26
 
+    PMC->PMC_PCER0 |= (1 << ID_PIOC); // Activate clock for PIOC
+
+
     //deactivating write protection
     TC2 -> TC_WPMR = (0x54494D << 8); //WPKEY =0x54494D 
 
     //setting block mode register
+    uint32_t bmr = (1<<8) | (1<<9) | (1<<0);  //activating quadrature mode and  enabling postition on channel 0
     uint32_t bmr = (1<<8) | (1<<9) | (1<<0);  //activating quadrature mode and  enabling postition on channel 0
     TC2->TC_BMR = bmr;
 
@@ -29,7 +33,6 @@ void encoder_init() {
     TC2->TC_CHANNEL[0].TC_CCR = (1<<0) | (1<<2);
 
     // ENABLE DIRECTION CONTROLL
-    PMC->PMC_PCER0 |= (1 << ID_PIOC); // Activate clock for PIOC
 
     PIOC->PIO_PER |= (1 << MOTOR_DIRECTION_PIN); // Activate control over pin C23
 
