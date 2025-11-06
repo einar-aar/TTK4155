@@ -79,6 +79,7 @@ int main()
 
     int IR_value = 10;
     int old_x_value = 0;
+    int old_y_value = 0;
 
     while (1)
     {
@@ -99,12 +100,13 @@ int main()
         //printf("Data received: %d %d %d %d\n\r", msg_rx.data[0], msg_rx.data[1], msg_rx.data[2], msg_rx.data[3]);
 
         ADC_values = scale_result(&msg_rx);
-        //printf("Scaled data received: %d %d %d %d %d\n\r", ADC_values[0], ADC_values[1], ADC_values[2], ADC_values[3], ADC_values[4]);
+        // printf("Scaled data received: %d %d %d %d %d\n\r", ADC_values[0], ADC_values[1], ADC_values[2], ADC_values[3], ADC_values[4]);
 
-        if (ADC_values[1] >= old_x_value - 1 && ADC_values[1] <= old_x_value + 1);
-        else set_duty_cycle(ADC_values[1], F_CPU, 1);
-        
-        old_x_value = ADC_values[1];
+        if (ADC_values[1] >= old_y_value + 3 || ADC_values[1] <= old_y_value - 3) set_duty_cycle(ADC_values[1], F_CPU, 1);
+        old_y_value = ADC_values[1];
+
+        if (ADC_values[0] >= old_x_value + 3 || ADC_values[0] <= old_x_value - 3) set_motor_pos(ADC_values[0]);
+        old_x_value = ADC_values[0];
         
         /*IR_value = ADC_read();
         printf("IR value: %d\n\r", IR_value);*/
@@ -118,6 +120,8 @@ int main()
         if (ADC_values[4] == 1) solenoid_activate();
 
         if (ADC_values[4] == 0) solenoid_deactivate();
+
+        printf("Value: %d\n\r", TC2->TC_CHANNEL[0].TC_CV);
 
         fflush(stdout);
         free(ADC_values);
