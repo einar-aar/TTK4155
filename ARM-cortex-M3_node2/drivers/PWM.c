@@ -15,6 +15,11 @@ void PWMinit(uint32_t mck) {
     PIOB -> PIO_ABSR |= PIO_ABSR_P13; //setting peripheral function B at pin PB13
     PIOB -> PIO_MDDR |= (1<<13); //deactivating multi-driver, setting as standard output on PB13
 
+    //enabling pwm signal for motor driver (PB12)
+    PIOB -> PIO_PDR |= PIO_PDR_P12; //deactivating PIO, opening pin PB13 for perihperal
+    PIOB -> PIO_ABSR |= PIO_ABSR_P12; //setting peripheral function B at pin PB12
+    PIOB -> PIO_MDDR |= (1<<12); //deactivating multi-driver, setting as standard output on PB12
+
     //deactivating write protection
     PWM->PWM_WPCR = (0x50574D << 8) | (0b11111100); //WPKEY =0x50574D
     PWM-> PWM_WPCR &= ~((1<<0)||(1<<1));
@@ -32,12 +37,14 @@ void PWMinit(uint32_t mck) {
     //setting channel mode 
     uint32_t prescaler = 0b0111 ; //dividing MCK/128
     uint32_t CPOL = 0b1000000000; //setting channel polarity as high (=1)
-    PWM -> PWM_CH_NUM[1].PWM_CMR = prescaler|CPOL ;
 
-    PWM -> PWM_CH_NUM[1].PWM_CMR &= ~(1<<10); //setting CES = 0 The channel counter is clocked by the prescaler output
+    // channel 1
     PWM -> PWM_CH_NUM[1].PWM_CMR = prescaler|CPOL ;
-
     PWM -> PWM_CH_NUM[1].PWM_CMR &= ~(1<<10); //setting CES = 0 The channel counter is clocked by the prescaler output
+
+    //channel 0
+    PWM -> PWM_CH_NUM[0].PWM_CMR = prescaler|CPOL ;
+    PWM -> PWM_CH_NUM[0].PWM_CMR &= ~(1<<10); //setting CES = 0 The channel counter is clocked by the prescaler output
 
 
     //setting channel period (CPRD) 
@@ -45,17 +52,24 @@ void PWMinit(uint32_t mck) {
     // T = (prescaler*CPRD)/ MCK --> CPRD = T*MCK/prescaler 
     int CPRD = 0.02*mck/128; //definert fra før av?
     PWM -> PWM_CH_NUM[1].PWM_CPRD = CPRD;
+    PWM -> PWM_CH_NUM[0].PWM_CPRD = CPRD;
+
 
     //seting duty cycle for channel (only init value, real value will be set as a function of controller output )
     //duty cycle = (T- 1/f_channel*CDTY)/(T) , f_channel = mck/128
 
     int CDTY = (CPRD/2); //
     PWM -> PWM_CH_NUM[1].PWM_CDTY = CDTY;
+    PWM -> PWM_CH_NUM[0].PWM_CDTY = CDTY;
 
 
     PWM -> PWM_ENA = PWM_ENA_CHID1; //enabling PWM output for channel 1
+    PWM -> PWM_ENA = PWM_ENA_CHID0; //enabling PWM output for channel 0
+
 
     PWM -> PWM_IER1 = PWM_IER1_CHID1; //enabling PWM interrupt on channel 1
+    PWM -> PWM_IER1 = PWM_IER1_CHID0; //enabling PWM interrupt on channel 1
+ 
 
     //active write protection
     PWM -> PWM_WPCR = (0x50574D << 8) | (0b11011100) |(1<<0); //enabling write protect for everything but the period and duty_cycle registers
@@ -99,12 +113,18 @@ float controller_output_to_duty_ratio(int contr_output) {
 
 
 
-void set_duty_cycle(int power, uint32_t mck){ 
+void set_duty_cycle(int power, uint32_t mck, int channel){ 
+    //channel 0 = motor driver (joystick xpos)
+    //channel 0 = servo (joystick y_pos)
+    if (channel != 0 | 1) {
+        printf("invalid channel choice");
+        return;
+    }
 
     float duty_ratio = controller_output_to_duty_ratio(power); // testverdi
 
     //CDTY = duty_ratio*CPRD
-    uint32_t CPRD = PWM->PWM_CH_NUM[1].PWM_CPRD;
+    uint32_t CPRD = PWM->PWM_CH_NUM[channel].PWM_CPRD;
 
     //uint32_t CDTYmax = (uint32_t)(0.105 * (float)CPRD);// calculating max and min 
 

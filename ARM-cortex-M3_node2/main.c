@@ -9,6 +9,7 @@
 #include "drivers/PWM.h"
 #include "drivers/adc.h"
 #include "drivers/solenoid.h"
+#include "drivers/motor_controller.h"
 
 #define baud 9600
 #define F_CPU 84000000 // 84 MHz
@@ -52,6 +53,7 @@ int main()
 
     ADC_init();
     solenoid_init();
+    encoder_init();
 
     /*// Test CAN
     CAN_MESSAGE msg;
@@ -100,7 +102,7 @@ int main()
         //printf("Scaled data received: %d %d %d %d %d\n\r", ADC_values[0], ADC_values[1], ADC_values[2], ADC_values[3], ADC_values[4]);
 
         if (ADC_values[1] >= old_x_value - 1 && ADC_values[1] <= old_x_value + 1);
-        else set_duty_cycle(ADC_values[1], F_CPU);
+        else set_duty_cycle(ADC_values[1], F_CPU, 1);
         
         old_x_value = ADC_values[1];
         
@@ -114,8 +116,6 @@ int main()
         }
 
         if (ADC_values[4] == 1) solenoid_activate();
-
-        if (ADC_values[4] == 0) solenoid_deactivate();
 
         if (ADC_values[4] == 0) solenoid_deactivate();
 
