@@ -4,7 +4,6 @@
 
 #define MOTOR_DIRECTION_PIN 23
 #define F_CPU 84000000
-#define F_CPU 84000000
 
 void encoder_init() {
     //activate clock for the Timer counter- module in Power management controller 
@@ -16,18 +15,23 @@ void encoder_init() {
     PIOC -> PIO_ABSR |= PIO_ABSR_P25; //setting peripheral function B at pin PC25
     PIOC -> PIO_ABSR |= PIO_ABSR_P26; //setting peripheral function B at pin PC26
 
+    PMC->PMC_PCER0 |= (1 << ID_PIOC); // Activate clock for PIOC
+
+
+    //deactivating write protection
+    TC2 -> TC_WPMR = (0x54494D << 8); //WPKEY =0x54494D 
+
     //setting block mode register
-    uint32_t bmr = (1<<8) | (1<<9);  //activating quadrature mode and  enabling postition on channel 0
+    uint32_t bmr = (1<<8) | (1<<9) | (1<<0);  //activating quadrature mode and  enabling postition on channel 0
     TC2->TC_BMR = bmr;
 
     //selecting clock for channel 0
     TC2->TC_CHANNEL[0].TC_CMR = 0b101; //selcting clock XC0
 
     //enabling channel 0
-    TC2->TC_CHANNEL[0].TC_CCR = 0b1;
+    TC2->TC_CHANNEL[0].TC_CCR = (1<<0) | (1<<2);
 
     // ENABLE DIRECTION CONTROLL
-    PMC->PMC_PCER0 |= (1 << ID_PIOC); // Activate clock for PIOC
 
     PIOC->PIO_PER |= (1 << MOTOR_DIRECTION_PIN); // Activate control over pin C23
 
@@ -35,12 +39,22 @@ void encoder_init() {
 
     PIOC->PIO_CODR |= (1 << MOTOR_DIRECTION_PIN); // Clear output register
 
+    //activatining write protection
+
 }
 
 void set_motor_dir(int joystick_value) {
 
-    if (joystick_value < 0) PIOC->PIO_CODR |= (1 << MOTOR_DIRECTION_PIN);
-    else PIOC->PIO_SODR |= (1 << MOTOR_DIRECTION_PIN);
+    if (joystick_value < 0) {
+        
+        printf("Sliding in - direction\n\r");
+        PIOC->PIO_CODR |= (1 << MOTOR_DIRECTION_PIN);
+
+    } else {
+        
+        printf("Sliding in + direction\n\r");
+        PIOC->PIO_SODR |= (1 << MOTOR_DIRECTION_PIN);
+    }
 }
 
 void set_motor_pos(int joystick_value) {

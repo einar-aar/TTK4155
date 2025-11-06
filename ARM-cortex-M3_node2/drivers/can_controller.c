@@ -233,20 +233,20 @@ int* scale_result(CAN_MESSAGE* msg) {
         if (i == 1) {//x axis joystick
             if (msg->data[0] < joystick_x_center) {
                 
-                scaled = (int) (((float)((msg->data[0]-joystick_x_center)*100)/(joystick_x_min_val-joystick_x_center)));
+                scaled = (int) (((float)((msg->data[0]-joystick_x_center)*100)/(joystick_x_min_val-joystick_x_center)))+1;
             }
             else {
-                scaled = (int) (((float)(msg->data[0]-joystick_x_center)/(joystick_x_max_val-joystick_x_center))*-100);
+                scaled = (int) (((float)(msg->data[0]-joystick_x_center)/(joystick_x_max_val-joystick_x_center))*-100)+1;
             }
         }
 
         else if (i == 0) { //y_axis joystick
             if (msg->data[1] < joystick_y_center) {
                 
-                scaled = (int) (((float)(msg->data[1]-joystick_y_center)/(joystick_y_min_val-joystick_y_center))*100/55*100);
+                scaled = (int) (((float)(msg->data[1]-joystick_y_center)/(joystick_y_min_val-joystick_y_center))*100/55*100)+2;
             }
             else {
-                scaled = (int) (((float)(msg->data[1]-joystick_y_center)/(joystick_y_max_val-joystick_y_center))*-100);
+                scaled = (int) (((float)(msg->data[1]-joystick_y_center)/(joystick_y_max_val-joystick_y_center))*-100)+2;
             }
         }
         else { //touchpad x and y axis

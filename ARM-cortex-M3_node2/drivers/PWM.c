@@ -113,13 +113,13 @@ float controller_output_to_duty_ratio(int contr_output) {
 
 
 
-void set_duty_cycle(int power, uint32_t mck, int channel){ 
+void set_duty_cycle(int power, uint32_t mck, int channel) {
     //channel 0 = motor driver (joystick xpos)
     //channel 1 = servo (joystick y_pos)
-    if (channel != 0 | 1) {
-        printf("invalid channel choice");
+    /*if (channel != 0 || channel != 1) {
+        printf("invalid channel choice\n\r");
         return;
-    }
+    }*/
 
     float duty_ratio = controller_output_to_duty_ratio(power); // testverdi
 
@@ -131,7 +131,9 @@ void set_duty_cycle(int power, uint32_t mck, int channel){
     uint32_t CDTY_val = (uint32_t)(duty_ratio * (float)CPRD);    
     //uint32_t CDTY_val = CPRD/8;
 
+    if (channel==0) CDTY_val *= 3;
+
     //setting duty_cycle
-    PWM->PWM_CH_NUM[1].PWM_CDTYUPD = CDTY_val;
+    PWM->PWM_CH_NUM[channel].PWM_CDTYUPD = CDTY_val;
     
 }
