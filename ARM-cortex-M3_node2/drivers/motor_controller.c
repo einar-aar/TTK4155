@@ -1,5 +1,6 @@
 #include "motor_controller.h"
 #include "sam.h"
+#include "PWM.h"
 
 #define MOTOR_DIRECTION_PIN 23
 
@@ -40,4 +41,8 @@ void set_motor_dir(int joystick_value) {
     else PIOC->PIO_SODR |= (1 << MOTOR_DIRECTION_PIN);
 }
 
-void 
+void set_motor_pos(int joystick_value) {
+
+    set_motor_dir(joystick_value);
+    
+}
