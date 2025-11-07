@@ -16,11 +16,7 @@ void PWMinit(uint32_t mck) {
     PIOB -> PIO_ABSR |= PIO_ABSR_P13; //setting peripheral function B at pin PB13
     PIOB -> PIO_MDDR |= (1<<13); //deactivating multi-driver, setting as standard output on PB13
 
-    //enabling pwm signal for motor driver (PB12)
-    PMC -> PMC_PCER0 |= PMC_PCER0_PID12; //enables peripheral clock TC0 (timer counter channel 0)
-    PIOB -> PIO_PDR |= PIO_PDR_P12; //deactivating PIO, opening pin PB13 for perihperal
-    PIOB -> PIO_ABSR |= PIO_ABSR_P12; //setting peripheral function B at pin PB12
-    PIOB -> PIO_MDDR |= (1<<12); //deactivating multi-driver, setting as standard output on PB12
+
 
     //deactivating write protection
     PWM->PWM_WPCR = (0x50574D << 8) | (0b11111100); //WPKEY =0x50574D
@@ -44,37 +40,22 @@ void PWMinit(uint32_t mck) {
     PWM -> PWM_CH_NUM[1].PWM_CMR = prescaler|CPOL ;
     PWM -> PWM_CH_NUM[1].PWM_CMR &= ~(1<<10); //setting CES = 0 The channel counter is clocked by the prescaler output
 
-    //channel 0
-    PWM -> PWM_CH_NUM[0].PWM_CMR = prescaler|CPOL ;
-    PWM -> PWM_CH_NUM[0].PWM_CMR &= ~(1<<10); //setting CES = 0 The channel counter is clocked by the prescaler output
-
 
     //setting channel period (CPRD) 
-    //(for left aligned waveform)
+    //(for left aligned waveform)0x50574D
     // T = (prescaler*CPRD)/ MCK --> CPRD = T*MCK/prescaler 
     int CPRD = 0.02*mck/128; //definert fra før av?
     PWM -> PWM_CH_NUM[1].PWM_CPRD = CPRD;
-
-    int CPRD_ch0 = CPRD*100;
-    PWM -> PWM_CH_NUM[0].PWM_CPRD = CPRD_ch0;
-
 
     //seting duty cycle for channel (only init value, real value will be set as a function of controller output )
     //duty cycle = (T- 1/f_channel*CDTY)/(T) , f_channel = mck/128
 
     int CDTY = (CPRD/2); //
-    int CDTY_ch0 =(CPRD_ch0/2);
     PWM -> PWM_CH_NUM[1].PWM_CDTY = CDTY;
-    PWM -> PWM_CH_NUM[0].PWM_CDTY = CDTY_ch0;
-
 
     PWM -> PWM_ENA |= PWM_ENA_CHID1; //enabling PWM output for channel 1
-    PWM -> PWM_ENA |= PWM_ENA_CHID0; //enabling PWM output for channel 0
 
-
-    PWM -> PWM_IER1 |= PWM_IER1_CHID1; //enabling PWM interrupt on channel 1
-    PWM -> PWM_IER1 |= PWM_IER1_CHID0; //enabling PWM interrupt on channel 0
- 
+    PWM -> PWM_IER1 |= PWM_IER1_CHID1; //enabling PWM interrupt on channel 1 
 
     //active write protection
     PWM -> PWM_WPCR = (0x50574D << 8) | (0b11011100) |(1<<0); //enabling write protect for everything but the period and duty_cycle registers
@@ -83,31 +64,87 @@ void PWMinit(uint32_t mck) {
 
 }
 
+void ENABLEpwm_init(uint32_t mck) {
+    //activate clock for the PWM- module in Power management controller 
+    //Peripheral ID = 36 (PWM) --> PMC_PCER1 bit 4
+    PMC -> PMC_PCER1 = (1 << 4); //setting bit nr 4 high as it corresponds to 36. Setting clk for PWM
+    PMC -> PMC_PCER0 |= (1u << ID_PIOB); // Set clk for PIOB
+
+    //enabling pwm signal for motor driver (PB12)
+    PMC -> PMC_PCER0 |= PMC_PCER0_PID12; //enables peripheral clock TC0 (timer counter channel 0)
+    PIOB -> PIO_PDR |= PIO_PDR_P12; //deactivating PIO, opening pin PB12 for perihperal
+    PIOB -> PIO_ABSR |= PIO_ABSR_P12; //setting peripheral function B at pin PB12
+    PIOB -> PIO_MDDR |= (1<<12); //deactivating multi-driver, setting as standard output on PB12
+
+
+    //deactivating write protection
+    PWM->PWM_WPCR = (0x50574D << 8) | (0b11111100); //WPKEY =0x50574D
+    PWM-> PWM_WPCR &= ~((1<<0)||(1<<1));
+
+    if(((PWM -> PWM_WPSR & PWM_WPSR_WPHWS0) | (PWM -> PWM_WPSR & PWM_WPSR_WPHWS1)) !=0) {
+        printf("WP-fault\r\n");
+        return;
+    }
+    
+    //set clock for PWM module (initialize PWM chapter 38.6.5.1
+
+    PWM -> PWM_CLK = 0; // stopping all clocks
+    PWM -> PWM_CLK |= (1<<0) | (1<<16); //activating both clocks (CLKA&B) without dividing
+
+    //setting channel mode 
+    uint32_t prescaler = 0b0111 ; //dividing MCK/128
+    uint32_t CPOL = 0b1000000000; //setting channel polarity as high (=1)
+
+
+    //channel 0
+    PWM -> PWM_CH_NUM[0].PWM_CMR = prescaler|CPOL ;
+    PWM -> PWM_CH_NUM[0].PWM_CMR &= ~(1<<10); //setting CES = 0 The channel counter is clocked by the prescaler output
+
+
+    //setting channel period (CPRD) 
+    //(for left aligned waveform)
+    // T = (prescaler*CPRD)/ MCK --> CPRD = T*MCK/prescaler 
+    int CPRD = 0.2*mck/128; 
+    PWM -> PWM_CH_NUM[0].PWM_CPRD = CPRD;
+
+
+    //seting duty cycle for channel (only init value, real value will be set as a function of controller output )
+    //duty cycle = (T- 1/f_channel*CDTY)/(T) , f_channel = mck/128
+
+    int CDTY = (CPRD/2); //
+    PWM -> PWM_CH_NUM[0].PWM_CDTY = CDTY;
+
+
+    PWM -> PWM_ENA |= PWM_ENA_CHID0; //enabling PWM output for channel 0
+
+
+    PWM -> PWM_IER1 |= PWM_IER1_CHID0; //enabling PWM interrupt on channel 0
+ 
+
+    //active write protection
+    PWM -> PWM_WPCR = (0x50574D << 8) | (0b11011100) |(1<<0); //enabling write protect for everything but the period and duty_cycle registers
+
+    return;
+}
 
 //takes in joystick_pos in x direction and calculates duty cycle 
 
 
 float controller_output_to_duty_ratio(int contr_output, int channel) {
+    
+    const int contr_output_max = 100; //what is the range of the controller output?
+    const int contr_output_min = -100; 
 
-    const int contr_output_max; 
-    const int contr_output_min; 
-    const float duty_min;       //  0.9 ms / 20 ms ≈ 4.5 %
-    const float duty_max;
+    const float duty_min = 0.045f;       //  0.9 ms / 20 ms ≈ 4.5 %
+    const float duty_max = 0.105f;       //  2.1 ms / 20 ms ≈ 10.5 %
 
-    if (channel == 1) {
-        const int contr_output_max = 100; 
-        const int contr_output_min = -100; 
-
-        const float duty_min = 0.045f;       //  0.9 ms / 20 ms ≈ 4.5 %
-        const float duty_max = 0.105f;       //  2.1 ms / 20 ms ≈ 10.5 %
-    } else {
+    if (channel == 0) {
         const int contr_output_max = 100; //what is the range of the controller output?
         const int contr_output_min = -100; 
 
         const float duty_min = 0.045f;       //  0.9 ms / 20 ms ≈ 4.5 %
-        const float duty_max = 0.105f;       //  2.1 ms / 20 ms ≈ 10.5 %
+        const float duty_max = 0.105f;
     }
-    
 
 
     //making shure the duty sycle stays within range
