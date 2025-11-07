@@ -19,8 +19,8 @@ static inline void set_phase_negative(void) {
 // Sett duty på ENABLE-kanalen (0.0–1.0)
 static inline void set_enable_pwm_duty_ratio(float duty) {
     //ensuring the duty cycle stays within bounds { // call in time increments (f.ex. 1.ms), or in this case DT_DEFAULT
-    const float duty_min = 0.045f;       
-    const float duty_max = 0.105f;
+    const float duty_min = 0.045f;       //what should bounds of duty_cycle be?
+    const float duty_max = 0.100f;
     if (duty < duty_min) duty = duty_min;
     if (duty > duty_max) duty = duty_max;
 
@@ -36,25 +36,33 @@ static inline void pi_integrate_with_antiwindup(float e, float u_unsat, float u_
     }
 }
 
-// Kalles periodisk med mål og referanse (i tellemikro-trinn)
-void motor_pi_step(int ref_counts, int pos_counts, float dt) {
+//called periodically wit ref and meas
+void motor_pid_step(int ref_counts, int pos_counts, float dt) {
     if (dt <= 0.0f) dt = DT_DEFAULT;
 
     // error
     float e = (float)(ref_counts - pos_counts);
+    float y = (float)(pos_counts);
 
-    // 2) PI
-    float u_unsat = (Kp * e + integ);
 
-    // 3) saturation
+    //implementing derivative action
+    float ydot = (y-y_prev)/dt; //estimate
+    float a = dt/( dt + t_d);
+    filter += a *(ydot-filter);
+    y_prev = y;
+
+    //PID
+    float u_unsat = (Kp * e + integ- Kd*filter);
+
+    //saturation
     float u_sat = u_unsat;
     if (u_sat >  UMAX) u_sat =  UMAX;
     if (u_sat < -UMAX) u_sat = -UMAX;
 
-    // 4) Anti-windup
+    //anti-windup
     pi_integrate_with_antiwindup(e, u_unsat, u_sat, dt);
 
-    // 5) setting PHASE, ENABLE-duty = |u|/UMAX
+    //setting PHASEDIR, ENABLE-duty = |u|/UMAX
     if (u_sat >= 0.0f) set_phase_negative();
     else               set_phase_positive();
 
@@ -97,5 +105,5 @@ int scale_joystick_pos_to_motor_pos(int joystick_pos) {
 void control_loop_tick(int joystick_pos) { // call in time increments (f.ex. 1.ms), or in this case DT_DEFAULT
     int pos   = get_encoder_pos();       // measurements from encoder, scaled to 
     int ref   = scale_joystick_pos_to_motor_pos(joystick_pos); // joystick reference value
-    motor_pi_step(ref, pos, DT_DEFAULT);
+    motor_pid_step(ref, pos, DT_DEFAULT);
 }
