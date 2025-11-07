@@ -121,7 +121,8 @@ int main()
 
         if (ADC_values[4] == 0) solenoid_deactivate();
 
-        printf("Value: %d\n\r", TC2 -> TC_CHANNEL[0].TC_CV);
+        // printf("Value: %d\n\r", TC2 -> TC_CHANNEL[0].TC_CV);
+        printf("Value: %d\n\r", get_encoder_pos());
 
         fflush(stdout);
         free(ADC_values);
