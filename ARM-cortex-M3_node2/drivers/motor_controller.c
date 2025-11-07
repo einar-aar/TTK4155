@@ -11,6 +11,7 @@ void encoder_init() {
     //Peripheral ID = 29 (PWM) --> PMC_PCER0 bit 4
     PMC -> PMC_PCER0 |= PMC_PCER0_PID29; //setting bit nr 29 high as it corresponds to 29
     PMC -> PMC_PCER0 |= (1 << ID_PIOC);
+    PMC->PMC_PCER1 |= (1 << (ID_TC6 - 32)); 
     PIOC ->PIO_PDR |= (PIO_PC25 | PIO_PC26); //deactivating PIO, opening pin PC25&PC26 for perihperal
     PIOC -> PIO_ABSR |= (PIO_PC25 | PIO_PC26); //setting peripheral function B at pin PC25&26
     
@@ -44,17 +45,19 @@ void encoder_init() {
     PIOC -> PIO_OER |=(1 << MOTOR_DIRECTION_PIN);
     PIOC -> PIO_CODR |=(1 << MOTOR_DIRECTION_PIN);
 
+    REG_TC2_WPMR = 0b1 | 0x54494D;
+    REG_TC2_CCR0 = 0b101;
+    REG_TC2_CMR0 = 5;
+    REG_TC2_BMR = (1<<8) | (1<<9);
     
     //reactivating write protection
     //TC2 -> TC_WPMR = ((0x54494D << 8) | 1);
     TC2 -> TC_WPMR |= 1;
-    
-
 }
 
 
 int get_encoder_pos(void) {
-    return (int)(TC2 -> TC_CHANNEL[0].TC_CV);
+    return REG_TC2_CV0;
 }
 
 
@@ -62,13 +65,13 @@ void set_motor_dir(int joystick_value) {
 
     if (joystick_value < -5) {
         
-        printf("Sliding in - direction\n\r");
-        PIOC->PIO_CODR |= (1 << MOTOR_DIRECTION_PIN);
+        // printf("Sliding in - direction\n\r");
+        PIOC->PIO_SODR |= (1 << MOTOR_DIRECTION_PIN);
 
     } else if (joystick_value > 5) {
         
-        printf("Sliding in + direction\n\r");
-        PIOC->PIO_SODR |= (1 << MOTOR_DIRECTION_PIN);
+        // printf("Sliding in + direction\n\r");
+        PIOC->PIO_CODR |= (1 << MOTOR_DIRECTION_PIN);
     }
 }
 

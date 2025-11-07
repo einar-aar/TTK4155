@@ -29,7 +29,7 @@ char SPI_transfer (char data) {
     SPDR = data;
 
     // Wait until data is transmitted
-    while (!((1 << SPIF) & SPSR));
+    while (!((1 << SPIF) & SPSR)); // GETS STUCK HERE WHEN WE TRY CAN RECEIVE
 
     return SPDR;
 }

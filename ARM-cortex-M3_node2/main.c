@@ -87,6 +87,7 @@ int main()
 
     bool running = true;
 
+    
     while (running)
     {
         time = (int)totalMsecs(time_now()) - start_time;
@@ -97,6 +98,7 @@ int main()
         // LED av
         PIOB->PIO_CODR = (1u << 27);
         for (volatile int i = 0; i < 1000000; i++);*/
+        
         for (volatile int i = 0; i < 100000; i++);
         
         
@@ -119,6 +121,7 @@ int main()
         /*IR_value = ADC_read();
         printf("IR value: %d\n\r", IR_value);*/
 
+        
         if (score()) {
             
             goals++;
@@ -131,17 +134,28 @@ int main()
 
         // printf("Value: %d\n\r", TC2 -> TC_CHANNEL[0].TC_CV);
         printf("Value: %d\n\r", get_encoder_pos());
-        // printf("Time in seconds: %d\n\r", time / 1000);
+        //printf("Time in seconds: %d\n\r", time / 1000);
 
-        CAN_MESSAGE* msg_tx;
-        msg_tx->data[0] = goals;
-        msg_tx->data[1] = time;
-        msg_tx->data_length = 2;
-        msg_tx->id = 0;
 
-        can_send(&msg_tx, 1);
+        // can_send makes control janky, maybe it takes alot of time
+        // can_send(&msg_tx, 0);
+        int A = ADC_read();
+        if (A < 1000) printf("IR value: %d\n\r", A);
+        
 
         fflush(stdout);
         free(ADC_values);
+    }
+
+    time = 10;
+
+    CAN_MESSAGE msg_tx;
+    msg_tx.id = 1;
+    msg_tx.data_length = 1;
+    msg_tx.data[0] = time;
+
+    while (1) {
+        printf("msg sent\n\r");
+        can_send(&msg_tx, 0);
     }
 }
