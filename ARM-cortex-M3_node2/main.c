@@ -100,7 +100,7 @@ int main()
         //printf("Data received: %d %d %d %d\n\r", msg_rx.data[0], msg_rx.data[1], msg_rx.data[2], msg_rx.data[3]);
 
         ADC_values = scale_result(&msg_rx);
-        // printf("Scaled data received: %d %d %d %d %d\n\r", ADC_values[0], ADC_values[1], ADC_values[2], ADC_values[3], ADC_values[4]);
+        printf("Scaled data received: %d %d %d %d %d\n\r", ADC_values[0], ADC_values[1], ADC_values[2], ADC_values[3], ADC_values[4]);
 
         if (ADC_values[1] >= old_y_value + 3 || ADC_values[1] <= old_y_value - 3) set_duty_cycle(ADC_values[1], F_CPU, 1);
         old_y_value = ADC_values[1];
