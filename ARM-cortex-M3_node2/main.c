@@ -11,6 +11,7 @@
 #include "drivers/solenoid.h"
 #include "drivers/motor_controller.h"
 #include "drivers/time.h"
+#include "drivers/PI.h"
 
 #define baud 9600
 #define F_CPU 84000000 // 84 MHz
@@ -83,6 +84,7 @@ int main()
     int old_y_value = 0;
 
     int start_time = (int)totalMsecs(time_now());
+    int last_PI_time;
     int time;
 
     bool running = true;
@@ -99,7 +101,7 @@ int main()
         PIOB->PIO_CODR = (1u << 27);
         for (volatile int i = 0; i < 1000000; i++);*/
         
-        for (volatile int i = 0; i < 100000; i++);
+        //for (volatile int i = 0; i < 100000; i++);
         
         
         CAN_MESSAGE msg_rx;
@@ -115,12 +117,18 @@ int main()
         if (ADC_values[1] >= old_y_value + 3 || ADC_values[1] <= old_y_value - 3) set_duty_cycle(ADC_values[1], F_CPU, 1);
         old_y_value = ADC_values[1];
 
-        if (ADC_values[0] >= old_x_value + 3 || ADC_values[0] <= old_x_value - 3) set_motor_pos(ADC_values[0]);
-        old_x_value = ADC_values[0];
+        /*if (ADC_values[0] >= old_x_value + 3 || ADC_values[0] <= old_x_value - 3) set_motor_pos(ADC_values[0]);
+        old_x_value = ADC_values[0];*/
         
         /*IR_value = ADC_read();
         printf("IR value: %d\n\r", IR_value);*/
 
+        if (time - last_PI_time >= 10) {
+
+            control_loop_tick(ADC_values[0]);
+
+            last_PI_time = time;
+        }
         
         if (score()) {
             
