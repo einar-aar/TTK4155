@@ -133,6 +133,14 @@ int main()
         printf("Value: %d\n\r", get_encoder_pos());
         // printf("Time in seconds: %d\n\r", time / 1000);
 
+        CAN_MESSAGE* msg_tx;
+        msg_tx->data[0] = goals;
+        msg_tx->data[1] = time;
+        msg_tx->data_length = 2;
+        msg_tx->id = 0;
+
+        can_send(&msg_tx, 1);
+
         fflush(stdout);
         free(ADC_values);
     }

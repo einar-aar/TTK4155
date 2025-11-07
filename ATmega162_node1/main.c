@@ -181,8 +181,10 @@ int external_memory_init(void) {
         CAN_FRAME* msg;
         CAN_receive_message(&msg);
 
+        printf("MSG received\n\rGoals: %d Time: %d", msg->data[0], msg->data[1]);
+
         // End game if ball block sensor
-        if (msg->data[0] == 1) {
+        if (msg->data[0] == 10) {
 
             running = false;
             break;
