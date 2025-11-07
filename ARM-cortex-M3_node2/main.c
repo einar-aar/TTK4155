@@ -10,6 +10,7 @@
 #include "drivers/adc.h"
 #include "drivers/solenoid.h"
 #include "drivers/motor_controller.h"
+#include "drivers/time.h"
 
 #define baud 9600
 #define F_CPU 84000000 // 84 MHz
@@ -81,8 +82,14 @@ int main()
     int old_x_value = 0;
     int old_y_value = 0;
 
-    while (1)
+    int start_time = (int)totalMsecs(time_now());
+    int time;
+
+    bool running = true;
+
+    while (running)
     {
+        time = (int)totalMsecs(time_now()) - start_time;
         /*
         PIOB->PIO_SODR = (1u << 27);
         for (volatile int i = 0; i < 1000000; i++);
@@ -91,6 +98,7 @@ int main()
         PIOB->PIO_CODR = (1u << 27);
         for (volatile int i = 0; i < 1000000; i++);*/
         for (volatile int i = 0; i < 100000; i++);
+        
         
         CAN_MESSAGE msg_rx;
         can_receive(&msg_rx, 0);
@@ -123,6 +131,7 @@ int main()
 
         // printf("Value: %d\n\r", TC2 -> TC_CHANNEL[0].TC_CV);
         printf("Value: %d\n\r", get_encoder_pos());
+        printf("Time in seconds: %d", time / 1000);
 
         fflush(stdout);
         free(ADC_values);

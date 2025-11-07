@@ -103,7 +103,7 @@ int external_memory_init(void) {
     }*/
 
     SPI_init();
-    // OLED_init();
+    OLED_init();
     CAN_controller_init();
 
     while(1) {
@@ -127,7 +127,80 @@ int external_memory_init(void) {
     msg_send.data[2] = 4;
     msg_send.data[3] = 7;
 
-    
+    // GAME FUNCTIONALITY
+    bool main_menu = true;
+    OLED_main_menu();
+
+    int* ADC_menu_values = malloc(sizeof(int)*5);
+    memset(ADC_menu_values, 0, sizeof(int)*5);
+
+    while (main_menu) {
+
+        ADC_menu_values = ADC_read_joystick_and_pad();
+        ADC_menu_values[4] = read_joystick_button();
+
+        if (ADC_menu_values[0] >= 50) {
+
+            OLED_main_menu_navigate('u');
+            _delay_ms(200);
+            
+        } else if (ADC_menu_values[0] <= -50) {
+
+            OLED_main_menu_navigate('d');
+            _delay_ms(200);
+        }
+
+        if (ADC_menu_values[4] == 1 && main_menu_position == 2) main_menu = false;
+
+        _delay_ms(10);
+    }
+
+    free(ADC_menu_values);
+
+    OLED_clear_screen();
+    OLED_draw_string(2, 4, "Game starting in: 3", 'm');
+    _delay_ms(1000);
+    OLED_clear_screen();
+    OLED_draw_string(2, 4, "Game starting in: 2", 'm');
+    _delay_ms(1000);
+    OLED_clear_screen();
+    OLED_draw_string(2, 4, "Game starting in: 1", 'm');
+    _delay_ms(1000);
+    OLED_clear_screen();
+
+    bool running = true;
+    int time = 0;
+    char score[5];
+    OLED_draw_string(2, 4, "Score:", 'm');
+    OLED_draw_string(3, 10, "0", 'm');
+
+    while (running) {
+
+        sendJoystickPos();
+
+        CAN_FRAME* msg;
+        CAN_receive_message(&msg);
+
+        // End game if ball block sensor
+        if (msg->data[0] == 1) {
+
+            running = false;
+            break;
+        }
+
+        // Update score
+        time = msg->data[1]
+        itoa(score, time, 10);
+        OLED_clear_page(3);
+        OLED_draw_string(3, 10, score, 'm');
+
+        _delay_ms(10);
+    }
+
+    OLED_clear_screen();
+    OLED_draw_string(2, 4 "GAME OVER", 'l');
+    OLED_draw_string(3, 4, "Score:", 'm');
+    OLED_draw_string(4, 10, score, 'm');
     
     /*
     CAN_FRAME msg_rcv;
@@ -184,7 +257,6 @@ int external_memory_init(void) {
 
     // OLED_draw_string(0, 0, "Hei, jeg heter Anders og liker fisk", 'm');
     /*
-    OLED_main_menu();
 
     int* ADC_values = malloc(sizeof(int)*4);
     memset(ADC_values, 0, sizeof(int)*4);

@@ -147,7 +147,7 @@ void CAN_receive_message(CAN_FRAME *frame) {
     if((intf & 0b00000001)==0b00000001) {
         buffer = 0;
         printf("interupt b0 raised\n\r");
-    } else if ((intf & 0b00000010)==0b00000010){
+    } else if ((intf & 0b00000010)==0b00000010) {
         buffer = 1;
         printf("interupt b1 raised\n\r");
     }
