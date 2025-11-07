@@ -53,15 +53,18 @@ void PWMinit(uint32_t mck) {
     // T = (prescaler*CPRD)/ MCK --> CPRD = T*MCK/prescaler 
     int CPRD = 0.02*mck/128; //definert fra før av?
     PWM -> PWM_CH_NUM[1].PWM_CPRD = CPRD;
-    PWM -> PWM_CH_NUM[0].PWM_CPRD = CPRD;
+
+    int CPRD_ch0 = CPRD*100;
+    PWM -> PWM_CH_NUM[0].PWM_CPRD = CPRD_ch0;
 
 
     //seting duty cycle for channel (only init value, real value will be set as a function of controller output )
     //duty cycle = (T- 1/f_channel*CDTY)/(T) , f_channel = mck/128
 
     int CDTY = (CPRD/2); //
+    int CDTY_ch0 =(CPRD_ch0/2);
     PWM -> PWM_CH_NUM[1].PWM_CDTY = CDTY;
-    PWM -> PWM_CH_NUM[0].PWM_CDTY = CDTY;
+    PWM -> PWM_CH_NUM[0].PWM_CDTY = CDTY_ch0;
 
 
     PWM -> PWM_ENA |= PWM_ENA_CHID1; //enabling PWM output for channel 1
@@ -83,13 +86,27 @@ void PWMinit(uint32_t mck) {
 //takes in joystick_pos in x direction and calculates duty cycle 
 
 
-float controller_output_to_duty_ratio(int contr_output) {
-    
-    const int contr_output_max = 100; //what is the range of the controller output?
-    const int contr_output_min = -100; 
+float controller_output_to_duty_ratio(int contr_output, int channel) {
 
-    const float duty_min = 0.045f;       //  0.9 ms / 20 ms ≈ 4.5 %
-    const float duty_max = 0.105f;       //  2.1 ms / 20 ms ≈ 10.5 %
+    const int contr_output_max; 
+    const int contr_output_min; 
+    const float duty_min;       //  0.9 ms / 20 ms ≈ 4.5 %
+    const float duty_max;
+
+    if (channel == 1) {
+        const int contr_output_max = 100; 
+        const int contr_output_min = -100; 
+
+        const float duty_min = 0.045f;       //  0.9 ms / 20 ms ≈ 4.5 %
+        const float duty_max = 0.105f;       //  2.1 ms / 20 ms ≈ 10.5 %
+    } else {
+        const int contr_output_max = 100; //what is the range of the controller output?
+        const int contr_output_min = -100; 
+
+        const float duty_min = 0.045f;       //  0.9 ms / 20 ms ≈ 4.5 %
+        const float duty_max = 0.105f;       //  2.1 ms / 20 ms ≈ 10.5 %
+    }
+    
 
 
     //making shure the duty sycle stays within range
@@ -122,7 +139,7 @@ void set_duty_cycle(int power, uint32_t mck, int channel) {
         return;
     }*/
 
-    float duty_ratio = controller_output_to_duty_ratio(power); // testverdi
+    float duty_ratio = controller_output_to_duty_ratio(power, channel); // testverdi
 
     //CDTY = duty_ratio*CPRD
     uint32_t CPRD = PWM->PWM_CH_NUM[channel].PWM_CPRD;
