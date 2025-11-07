@@ -6,14 +6,19 @@
 
 static volatile float Kp = 0.001f;    //tuning variables
 static volatile float Ki = 0.000f;    // Ki = Ki * dt for each call
-static volatile float Kd = 0.00001f;  
+static volatile float Kd = 0.00002f;  
 
 static volatile float integ = 0.0f;  //integral action
 
 //lowpass filter: a = dt/ (dt+ t_d)
-static volatile float t_d = 0.01f;  //timestep on lowpass_filter (adjustable)
+static volatile float t_d = 0.02f;  //timestep on lowpass_filter (adjustable)
 static float y_prev = 0.0f; //measurement of previous time step
 static float filter = 0.0f;
+
+//deadsone variables to prevent shaking
+static volatile float e_quiet_in = 3.0f; //enter "quiet mode" when e < e_quiet_in
+static volatile float e_quiet_exit = 7.0f; ////enter "quiet mode" when e < e_quiet_in
+static bool quiet_mode = false; 
 
 
 static inline void set_phase_positive(void);

@@ -19,7 +19,7 @@ static inline void set_phase_negative(void) {
 // Sett duty på ENABLE-kanalen (0.0–1.0)
 static inline void set_enable_pwm_duty_ratio(float duty) {
     //ensuring the duty cycle stays within bounds { // call in time increments (f.ex. 1.ms), or in this case DT_DEFAULT
-    const float duty_min = 0.045f;       //what should bounds of duty_cycle be?
+    const float duty_min = 0.00f;       //what should bounds of duty_cycle be?
     const float duty_max = 0.100f;
     if (duty < duty_min) duty = duty_min;
     if (duty > duty_max) duty = duty_max;
@@ -59,10 +59,28 @@ void motor_pid_step(int ref_counts, int pos_counts, float dt) {
     if (u_sat >  UMAX) u_sat =  UMAX;
     if (u_sat < -UMAX) u_sat = -UMAX;
 
+    //enter quiet mode (deadsone)
+    bool enter_quiet = (fabsf(e) < e_quiet_in);
+    bool exit_quiet = (fabsf(e) > e_quiet_exit);
+
+    if(quiet_mode) { // checking if it is necessary to enter/exit deadsone
+        if(exit_quiet) quiet_mode = false;
+    } else {
+        if(enter_quiet) quiet_mode = true;
+    }
+
+    //turning of motor in deadsone
+    if(quiet_mode) {
+        u_sat = 0.0f;
+        set_enable_pwm_duty_ratio(0.0f);
+        return;
+    }
+
+
     //anti-windup
     pi_integrate_with_antiwindup(e, u_unsat, u_sat, dt);
 
-    //setting PHASEDIR, ENABLE-duty = |u|/UMAX
+    //setting PHASEDIR, ENABLE-duty = |u|/UMAX 
     if (u_sat >= 0.0f) set_phase_negative();
     else               set_phase_positive();
 

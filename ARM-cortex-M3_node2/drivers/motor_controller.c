@@ -31,7 +31,7 @@ void encoder_init() {
     TC2->TC_BMR |= TC_BMR_POSEN;
     //TC2 -> TC_BMR |= TC_BMR_SPEEDEN;
     TC2->TC_BMR |= TC_BMR_EDGPHA;
-    TC2->TC_BMR |= TC_BMR_MAXFILT(4);
+    TC2->TC_BMR |= TC_BMR_MAXFILT(5);
     PMC -> PMC_PCER0 |=PMC_PCER0_PID12;
 
     //starting timer counter 2 (TC2)
