@@ -91,8 +91,8 @@ int external_memory_init(void) {
     printf("ADC-verdi: %02X\n\n\r", value);
 
     _delay_ms(50);*/
-    /*
-    int* ADC_values = malloc(sizeof(int)*4);
+    
+    /*int* ADC_values = malloc(sizeof(int)*4);
     memset(ADC_values, 0, sizeof(int)*4);
 
     while (1) {
@@ -102,30 +102,32 @@ int external_memory_init(void) {
         free(ADC_values);
     }*/
 
+    /*
+    CAN_FRAME msg_rx;
+
+    _delay_ms(1000);
+
+    while (1) {
+
+        CAN_receive_message(&msg_rx);
+        printf("Data received: %d", msg_rx.data[0]);
+    }*/
+
     SPI_init();
     OLED_init();
     CAN_controller_init();
 
+    
     while(1) {
+
         sendJoystickPos();
         _delay_ms(10);
-
     }
 
     _delay_ms(1000);
-
    
-
     uint8_t stat = CAN_read(0x0E);
     printf("CANSTAT: 0x%02X\n\r", stat);
-
-    CAN_FRAME msg_send;
-    msg_send.id = (uint32_t)0b00000001;
-    msg_send.dlc = 4;
-    msg_send.data[0] = 4;
-    msg_send.data[1] = 4;
-    msg_send.data[2] = 4;
-    msg_send.data[3] = 7;
 
     // GAME FUNCTIONALITY
     bool main_menu = true;
@@ -139,12 +141,12 @@ int external_memory_init(void) {
         ADC_menu_values = ADC_read_joystick_and_pad();
         ADC_menu_values[4] = read_joystick_button();
 
-        if (ADC_menu_values[0] >= 50) {
+        if (ADC_menu_values[1] >= 200) {
 
             OLED_main_menu_navigate('u');
             _delay_ms(200);
             
-        } else if (ADC_menu_values[0] <= -50) {
+        } else if (ADC_menu_values[1] <= 100) {
 
             OLED_main_menu_navigate('d');
             _delay_ms(200);
@@ -172,14 +174,14 @@ int external_memory_init(void) {
     int time = 0;
     char score[5];
     OLED_draw_string(2, 4, "Score:", 'm');
-    OLED_draw_string(3, 10, "0", 'm');
+    OLED_draw_string(3, 20, "0", 'm');
 
     while (running) {
 
         sendJoystickPos();
 
         CAN_FRAME* msg;
-        CAN_receive_message(&msg);
+        CAN_receive_message(msg);
 
         printf("MSG received\n\rGoals: %d Time: %d", msg->data[0], msg->data[1]);
 
@@ -191,18 +193,18 @@ int external_memory_init(void) {
         }
 
         // Update score
-        time = msg->data[1]
-        itoa(score, time, 10);
+        time = msg->data[1];
+        //itoa(score, time, 10);
         OLED_clear_page(3);
-        OLED_draw_string(3, 10, score, 'm');
+        //OLED_draw_string(3, 10, score, 'm');
 
         _delay_ms(10);
     }
 
     OLED_clear_screen();
-    OLED_draw_string(2, 4 "GAME OVER", 'l');
+    OLED_draw_string(2, 4, "GAME OVER", 'l');
     OLED_draw_string(3, 4, "Score:", 'm');
-    OLED_draw_string(4, 10, score, 'm');
+    //OLED_draw_string(4, 10, score, 'm');
     
     /*
     CAN_FRAME msg_rcv;

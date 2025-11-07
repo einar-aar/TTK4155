@@ -134,12 +134,12 @@ void CAN_receive_message(CAN_FRAME *frame) {
     uint8_t intf = 0; //leser frainterrupt registeret
 
     while(!(intf & 0b00000011)) {
+        printf("stuck in while\n\r");
         intf = CAN_read(MCP_CANINTF);
         //if((MCP_CANINTF & 0b00000001)==0b00000001) break;
         //if((MCP_CANINTF & 0b00000010)==0b00000010) break;
         //if(MCP_CANINTF == 0b00000010) break;
     }
-
 
     int buffer = 2;
 
