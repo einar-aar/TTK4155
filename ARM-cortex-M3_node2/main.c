@@ -10,6 +10,7 @@
 #include "drivers/adc.h"
 #include "drivers/solenoid.h"
 #include "drivers/motor_controller.h"
+#include "drivers/time.h"
 
 #define baud 9600
 #define F_CPU 84000000 // 84 MHz
@@ -81,8 +82,14 @@ int main()
     int old_x_value = 0;
     int old_y_value = 0;
 
-    while (1)
+    int start_time = (int)totalMsecs(time_now());
+    int time;
+
+    bool running = true;
+
+    while (running)
     {
+        time = (int)totalMsecs(time_now()) - start_time;
         /*
         PIOB->PIO_SODR = (1u << 27);
         for (volatile int i = 0; i < 1000000; i++);
@@ -92,6 +99,7 @@ int main()
         for (volatile int i = 0; i < 1000000; i++);*/
         for (volatile int i = 0; i < 100000; i++);
         
+        
         CAN_MESSAGE msg_rx;
         can_receive(&msg_rx, 0);
 
@@ -100,7 +108,7 @@ int main()
         //printf("Data received: %d %d %d %d\n\r", msg_rx.data[0], msg_rx.data[1], msg_rx.data[2], msg_rx.data[3]);
 
         ADC_values = scale_result(&msg_rx);
-        // printf("Scaled data received: %d %d %d %d %d\n\r", ADC_values[0], ADC_values[1], ADC_values[2], ADC_values[3], ADC_values[4]);
+        printf("Scaled data received: %d %d %d %d %d\n\r", ADC_values[0], ADC_values[1], ADC_values[2], ADC_values[3], ADC_values[4]);
 
         if (ADC_values[1] >= old_y_value + 3 || ADC_values[1] <= old_y_value - 3) set_duty_cycle(ADC_values[1], F_CPU, 1);
         old_y_value = ADC_values[1];
@@ -123,6 +131,7 @@ int main()
 
         // printf("Value: %d\n\r", TC2 -> TC_CHANNEL[0].TC_CV);
         printf("Value: %d\n\r", get_encoder_pos());
+        printf("Time in seconds: %d", time / 1000);
 
         fflush(stdout);
         free(ADC_values);

@@ -11,12 +11,13 @@ void PWMinit(uint32_t mck) {
     PMC -> PMC_PCER0 |= (1u << ID_PIOB); // Set clk for PIOB
 
     //the motor shield (Servo sig) uses pb13 
-    PMC -> PMC_PCER0 |= PMC_PCER0_PID12; //enables peripheral clock TC1 (timer counter channel 1)
+    PMC -> PMC_PCER0 |= PMC_PCER0_PID13; //enables peripheral clock TC1 (timer counter channel 1)
     PIOB -> PIO_PDR |= PIO_PDR_P13; //deactivating PIO, opening pin PB13 for perihperal
     PIOB -> PIO_ABSR |= PIO_ABSR_P13; //setting peripheral function B at pin PB13
     PIOB -> PIO_MDDR |= (1<<13); //deactivating multi-driver, setting as standard output on PB13
 
     //enabling pwm signal for motor driver (PB12)
+    PMC -> PMC_PCER0 |= PMC_PCER0_PID12; //enables peripheral clock TC0 (timer counter channel 0)
     PIOB -> PIO_PDR |= PIO_PDR_P12; //deactivating PIO, opening pin PB13 for perihperal
     PIOB -> PIO_ABSR |= PIO_ABSR_P12; //setting peripheral function B at pin PB12
     PIOB -> PIO_MDDR |= (1<<12); //deactivating multi-driver, setting as standard output on PB12
