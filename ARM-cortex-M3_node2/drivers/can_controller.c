@@ -132,7 +132,7 @@ uint8_t can_init(uint32_t can_br, uint8_t num_tx_mb, uint8_t num_rx_mb)
  */
 uint8_t can_send(CAN_MESSAGE* can_msg, uint8_t tx_mb_id)
 {
-	printf("In send function\n\r");
+	//printf("In send function\n\r");
 	//Check that mailbox is ready
 	if(CAN0->CAN_MB[tx_mb_id].CAN_MSR & CAN_MSR_MRDY)
 	{
