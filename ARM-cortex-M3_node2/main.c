@@ -180,6 +180,7 @@ int main()
         if (goals > 0) {
 
             printf("Game over\n\r");
+            set_enable_pwm_duty_ratio(0.00f);
             running = false;
             game_over = true;
         }
