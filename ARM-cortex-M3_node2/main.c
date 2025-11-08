@@ -84,11 +84,15 @@ int main()
     int old_y_value = 0;
 
     int start_time = (int)totalMsecs(time_now());
-    int last_PI_time;
+    int last_PI_time = 0;
     int time;
+    int last_time_print = 0;
 
     bool running = true;
 
+    CAN_MESSAGE msg_tx;
+    msg_tx.id = 1;
+    msg_tx.data_length = 2;
     
     while (running)
     {
@@ -141,8 +145,13 @@ int main()
         if (ADC_values[4] == 0) solenoid_deactivate();
 
         // printf("Value: %d\n\r", TC2 -> TC_CHANNEL[0].TC_CV);
-        printf("Value: %d\n\r", get_encoder_pos());
-        //printf("Time in seconds: %d\n\r", time / 1000);
+        //printf("Value: %d\n\r", get_encoder_pos());
+        
+        if (time - last_time_print > 1000) {
+            
+            printf("Time in seconds: %d\n\r", time / 1000);
+            last_time_print = time;
+        }
 
 
         // can_send makes control janky, maybe it takes alot of time
@@ -150,20 +159,17 @@ int main()
         int A = ADC_read();
         if (A < 1000) printf("IR value: %d\n\r", A);
         
+        if (goals == 10) {
+
+            printf("Game over\n\r");
+            running = false;
+        }
 
         fflush(stdout);
         free(ADC_values);
     }
 
-    time = 10;
-
-    CAN_MESSAGE msg_tx;
-    msg_tx.id = 1;
-    msg_tx.data_length = 1;
     msg_tx.data[0] = time;
-
-    while (1) {
-        printf("msg sent\n\r");
-        can_send(&msg_tx, 0);
-    }
+    msg_tx.data[1] = 1;
+    can_send(&msg_tx, 0);
 }

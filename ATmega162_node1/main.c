@@ -102,21 +102,9 @@ int external_memory_init(void) {
         free(ADC_values);
     }*/
 
-    /*
-    CAN_FRAME msg_rx;
-
-    _delay_ms(1000);
-
-    while (1) {
-
-        CAN_receive_message(&msg_rx);
-        printf("Data received: %d", msg_rx.data[0]);
-    }*/
-
     SPI_init();
     OLED_init();
     CAN_controller_init();
-
     
     while(1) {
 
@@ -173,37 +161,34 @@ int external_memory_init(void) {
     bool running = true;
     int time = 0;
     char score[5];
-    OLED_draw_string(2, 4, "Score:", 'm');
-    OLED_draw_string(3, 20, "0", 'm');
+    CAN_FRAME* msg;
+    OLED_draw_string(2, 4, "Game running", 'm');
 
     while (running) {
 
         sendJoystickPos();
 
-        CAN_FRAME* msg;
         CAN_receive_message(msg);
 
-        printf("MSG received\n\rGoals: %d Time: %d", msg->data[0], msg->data[1]);
-
         // End game if ball block sensor
-        if (msg->data[0] == 10) {
+        if (msg->data[1] == 1) {
 
             running = false;
             break;
         }
 
-        // Update score
-        time = msg->data[1];
-        //itoa(score, time, 10);
-        OLED_clear_page(3);
-        //OLED_draw_string(3, 10, score, 'm');
 
         _delay_ms(10);
     }
 
+    // Update score
+    time = msg->data[0];
+    itoa(time, score, 10);
+
     OLED_clear_screen();
     OLED_draw_string(2, 4, "GAME OVER", 'l');
     OLED_draw_string(3, 4, "Score:", 'm');
+    OLED_draw_string(4, 20, score, 'm');
     //OLED_draw_string(4, 10, score, 'm');
     
     /*

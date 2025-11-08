@@ -15,3 +15,5 @@ void CAN_controller_init();
 void CAN_transmit_message(CAN_FRAME frame, int buffer);
 
 void CAN_receive_message(CAN_FRAME *frame);
+
+void CAN_receive(CAN_FRAME* frame);

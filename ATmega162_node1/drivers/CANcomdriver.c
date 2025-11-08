@@ -119,6 +119,47 @@ void CAN_transmit_message(CAN_FRAME frame, int buffer) {
     }
 }
 
+char CAN_status() {
+
+    SPI_slaveselect(CAN);
+
+    SPI_transfer(MCP_READ_STATUS);
+    char status = SPI_transfer(0);
+
+    SPI_release_slave();
+
+    return status;
+}
+
+void CAN_receive(CAN_FRAME* frame) {
+
+    uint8_t status = CAN_status();
+
+    bool buffer_1_content = status & 1;
+    bool buffer_2_content = status & 2;
+
+    // Check if we have a message in either of the buffers
+    if (buffer_1_content || buffer_2_content) {
+        printf("test");
+        SPI_slaveselect(CAN);
+
+        buffer_1_content == true ? SPI_transfer(MCP_READ_RX0) : SPI_transfer(MCP_READ_RX1);
+
+        uint8_t sidh = SPI_transfer(0);
+        uint8_t sidl = SPI_transfer(0);
+        frame -> id = (sidh << 3) | (sidl >> 5);
+
+        SPI_transfer(0);
+        SPI_transfer(0);
+
+        frame -> dlc = SPI_transfer(0);
+
+        for (int i = 0; i < frame -> dlc; i++) frame -> data[i] = SPI_transfer(0);
+
+        SPI_release_slave();
+    }
+}
+
 void CAN_receive_message(CAN_FRAME *frame) {
 
     //declearing addresses
