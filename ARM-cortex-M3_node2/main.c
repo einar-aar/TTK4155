@@ -195,7 +195,8 @@ int main()
             game_over = false;
 
             while (1) {
-                set_enable_pwm_duty_ratio(0.0f);
+                //set_enable_pwm_duty_ratio(0.0f);
+                control_loop_tick(0);
             }
         }
 

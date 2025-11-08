@@ -124,12 +124,12 @@ int external_memory_init(void) {
     int* ADC_menu_values = malloc(sizeof(int)*5);
     memset(ADC_menu_values, 0, sizeof(int)*5);
 
-    /*CAN_FRAME msg_send;
+    CAN_FRAME msg_send;
     msg_send.id = (uint32_t)1;
     msg_send.dlc = 2;
     msg_send.data[0] = 0;
     msg_send.data[1] = 0;
-    CAN_transmit_message(msg_send, 1);*/
+    CAN_transmit_message(msg_send, 0);
 
     while (main_menu) {
 

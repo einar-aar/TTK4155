@@ -27,8 +27,8 @@ static volatile float e_quiet_exit = 7.0f; ////enter "quiet mode" when e < e_qui
 static bool quiet_mode = false; 
 
 
-void set_phase_positive(void);
-void set_phase_negative(void);
+static inline void set_phase_positive(void);
+static inline void set_phase_negative(void);
 void set_enable_pwm_duty_ratio(float duty);
 static inline void pi_integrate_with_antiwindup(float e, float u_unsat, float u_sat, float dt);
 void motor_pid_step(int ref_counts, int pos_counts, float dt);
