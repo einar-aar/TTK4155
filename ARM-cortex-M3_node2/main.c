@@ -12,6 +12,7 @@
 #include "drivers/motor_controller.h"
 #include "drivers/time.h"
 #include "drivers/PI.h"
+#include "drivers/game_func.h"
 
 #define baud 9600
 #define F_CPU 84000000 // 84 MHz
@@ -135,9 +136,24 @@ int main()
         }
         
         if (score()) {
+
+            bool goal = true;
+            register_goal = true;
             
-            goals++;
-            printf("Goals: %d\n\r", goals);
+            for (int i = 0; i < 5; i++) {
+
+                register_goal = true;
+                if (!score()) goal = false;
+
+            }
+
+            if (goal) {
+
+                goals++;
+                printf("Goals: %d\n\r", goals);
+                register_goal = false;
+            }
+            register_goal = false;
         }
 
         if (ADC_values[4] == 1) solenoid_activate();
@@ -147,21 +163,23 @@ int main()
         // printf("Value: %d\n\r", TC2 -> TC_CHANNEL[0].TC_CV);
         //printf("Value: %d\n\r", get_encoder_pos());
         
+        /*
         if (time - last_time_print > 1000) {
             
             printf("Time in seconds: %d\n\r", time / 1000);
             last_time_print = time;
         }
-
+        */
 
         // can_send makes control janky, maybe it takes alot of time
         // can_send(&msg_tx, 0);
         int A = ADC_read();
-        if (A < 1000) printf("IR value: %d\n\r", A);
+        //if (A < 1100) printf("IR value: %d\n\r", A);
         
-        if (goals == 10) {
+        if (goals > 0) {
 
             printf("Game over\n\r");
+            set_enable_pwm_duty_ratio(0.00f);
             running = false;
         }
 

@@ -105,12 +105,12 @@ int external_memory_init(void) {
     SPI_init();
     OLED_init();
     CAN_controller_init();
-    
+    /*
     while(1) {
 
         sendJoystickPos();
         _delay_ms(10);
-    }
+    }*/
 
     _delay_ms(1000);
    
@@ -168,13 +168,12 @@ int external_memory_init(void) {
 
         sendJoystickPos();
 
-        CAN_receive_message(msg);
+        CAN_receive(msg);
 
         // End game if ball block sensor
         if (msg->data[1] == 1) {
 
             running = false;
-            break;
         }
 
 
