@@ -111,7 +111,7 @@ int main()
         
         
         CAN_MESSAGE msg_rx;
-        can_receive(&msg_rx, 0);
+        can_receive(&msg_rx, 1);
 
         //set_duty_cycle(&msg_rx, F_CPU);
 
@@ -183,21 +183,18 @@ int main()
             set_enable_pwm_duty_ratio(0.00f);
             running = false;
             game_over = true;
+            msg_tx.data[0] = time;
+            msg_tx.data[1] = 14;
+            can_send(&msg_tx, 0);
         }
 
         if (game_over) {
 
             set_enable_pwm_duty_ratio(0.00f);
 
-            
-
-            msg_tx.data[0] = time;
-            msg_tx.data[1] = 1;
-            can_send(&msg_tx, 1);
             game_over = false;
 
             while (1) {
-
                 set_enable_pwm_duty_ratio(0.0f);
             }
         }

@@ -28,11 +28,11 @@ void sendJoystickPos() {
 
     fflush(stdout);
 
-    printf("Data read: %d %d %d %d %d\n\r", ADC_values[1], ADC_values[0], ADC_values[2], ADC_values[3], ADC_values[4]);
-    printf("Data sent: %d %d %d %d %d\n\r", msg_send.data[0], msg_send.data[1], msg_send.data[2], msg_send.data[3], msg_send.data[4]);
+    //printf("Data read: %d %d %d %d %d\n\r", ADC_values[1], ADC_values[0], ADC_values[2], ADC_values[3], ADC_values[4]);
+    //printf("Data sent: %d %d %d %d %d\n\r", msg_send.data[0], msg_send.data[1], msg_send.data[2], msg_send.data[3], msg_send.data[4]);
 
-    CAN_transmit_message(msg_send, 0);
-    printf("CAN message sent\n\r");
+    CAN_transmit_message(msg_send, 1);
+    //printf("CAN message sent\n\r");
     
     free(ADC_values);
 }

@@ -143,7 +143,8 @@ void CAN_receive(CAN_FRAME* frame) {
         printf("test");
         SPI_slaveselect(CAN);
 
-        buffer_1_content == true ? SPI_transfer(MCP_READ_RX0) : SPI_transfer(MCP_READ_RX1);
+        if (buffer_1_content) SPI_transfer(MCP_READ_RX0);
+        else SPI_transfer(MCP_READ_RX1);
 
         uint8_t sidh = SPI_transfer(0);
         uint8_t sidl = SPI_transfer(0);

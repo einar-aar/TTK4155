@@ -7,11 +7,11 @@
 #define MOTOR_DIRECTION_PIN 23
 
 // set PHASEDIR
-static inline void set_phase_positive(void) {
+void set_phase_positive(void) {
     // PHASEDIR = 1 → positive direction
     PIOC->PIO_SODR = (1u << MOTOR_DIRECTION_PIN);
 }
-static inline void set_phase_negative(void) {
+void set_phase_negative(void) {
     // PHASEDIR = 0 → negative direction
     PIOC->PIO_CODR = (1u << MOTOR_DIRECTION_PIN);
 }
@@ -72,6 +72,7 @@ void motor_pid_step(int ref_counts, int pos_counts, float dt) {
     //turning of motor in deadsone
     if(quiet_mode) {
         u_sat = 0.0f;
+        integ = 0.0f;
         set_enable_pwm_duty_ratio(0.0f);
         return;
     }
