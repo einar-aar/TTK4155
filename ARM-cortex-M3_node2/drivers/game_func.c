@@ -9,7 +9,7 @@ bool register_goal = true; // If the IR led is not blocked, we get a value highe
 
 uint8_t score() {
 
-    if (ADC_read() < 1500 && register_goal) {
+    if (ADC_read() > 700 && ADC_read() < 1300 && register_goal) {
         
         register_goal = false;
         return 1;

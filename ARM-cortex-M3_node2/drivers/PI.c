@@ -17,7 +17,7 @@ static inline void set_phase_negative(void) {
 }
 
 // Sett duty på ENABLE-kanalen (0.0–1.0)
-static inline void set_enable_pwm_duty_ratio(float duty) {
+void set_enable_pwm_duty_ratio(float duty) {
     //ensuring the duty cycle stays within bounds { // call in time increments (f.ex. 1.ms), or in this case DT_DEFAULT
     const float duty_min = 0.00f;       //what should bounds of duty_cycle be?
     const float duty_max = 0.100f;

@@ -74,4 +74,5 @@ build/main.o: main.c sam/sam3x/include/sam.h sam/sam3x/include/sam3x8e.h \
  sam/sam3x/include/pio/pio_sam3x8e.h drivers/uart.h \
  drivers/can_controller.h drivers/can_interrupt.h drivers/PWM.h \
  drivers/can_controller.h drivers/adc.h drivers/solenoid.h \
- drivers/motor_controller.h drivers/time.h drivers/PI.h
+ drivers/motor_controller.h drivers/time.h drivers/PI.h \
+ drivers/game_func.h
