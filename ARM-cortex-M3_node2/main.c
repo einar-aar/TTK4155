@@ -27,7 +27,7 @@
  */
 //#include "../path_to/uart.h"
 
-int goals = 0;
+int IR_blocked = 0;
 
 int main()
 
@@ -58,24 +58,7 @@ int main()
     solenoid_init();
     encoder_init();
 
-    /*// Test CAN
-    CAN_MESSAGE msg;
-
-    msg.id = (uint32_t)0b00000001;
-    msg.data_length = 4;
-
-    msg.data[0] = 1;
-    msg.data[1] = 3;
-    msg.data[2] = 5;
-    msg.data[3] = 7;
-
-    // can_send(&msg, 0);
-    // printf("Can message sent\n\r");
-    */
     
-    //CAN_MESSAGE msg_test;
-
-    //set_duty_cycle(&msg_test, F_CPU);
 
     int* ADC_values = malloc(sizeof(int)*5);
     memset(ADC_values, 0, sizeof(int)*5);
@@ -99,35 +82,16 @@ int main()
     while (running)
     {
         time = (int)totalMsecs(time_now()) - start_time;
-        /*
-        PIOB->PIO_SODR = (1u << 27);
-        for (volatile int i = 0; i < 1000000; i++);
-
-        // LED av
-        PIOB->PIO_CODR = (1u << 27);
-        for (volatile int i = 0; i < 1000000; i++);*/
-        
-        //for (volatile int i = 0; i < 100000; i++);
-        
         
         CAN_MESSAGE msg_rx;
         can_receive(&msg_rx, 1);
 
-        //set_duty_cycle(&msg_rx, F_CPU);
-
-        //printf("Data received: %d %d %d %d %d\n\r", msg_rx.data[0], msg_rx.data[1], msg_rx.data[2], msg_rx.data[3], msg_rx.data[4]);
-
         ADC_values = scale_result(&msg_rx);
-        //printf("Scaled data received: %d %d %d %d %d\n\r", ADC_values[0], ADC_values[1], ADC_values[2], ADC_values[3], ADC_values[4]);
 
         if (ADC_values[1] >= old_y_value + 3 || ADC_values[1] <= old_y_value - 3) set_duty_cycle(ADC_values[1], F_CPU, 1);
         old_y_value = ADC_values[1];
 
-        /*if (ADC_values[0] >= old_x_value + 3 || ADC_values[0] <= old_x_value - 3) set_motor_pos(ADC_values[0]);
-        old_x_value = ADC_values[0];*/
         
-        /*IR_value = ADC_read();
-        printf("IR value: %d\n\r", IR_value);*/
 
         if (time - last_PI_time >= 10) {
 
@@ -138,46 +102,34 @@ int main()
         
         if (score()) {
 
-            bool goal = true;
-            register_goal = true;
+            bool block = true;
+            register_block = true;
             
             for (int i = 0; i < 5; i++) {
 
-                register_goal = true;
-                if (!score()) goal = false;
+                register_block = true;
+                if (!score()) block = false;
 
             }
 
-            if (goal) {
+            if (block) {
 
-                goals++;
-                printf("Goals: %d\n\r", goals);
-                register_goal = false;
+                IR_blocked++;
+                printf("Goals: %d\n\r", IR_blocked);
+                register_block = false;
             }
-            register_goal = false;
+            register_block = false;
         }
 
         if (ADC_values[4] == 1) solenoid_activate();
 
         if (ADC_values[4] == 0) solenoid_deactivate();
 
-        // printf("Value: %d\n\r", TC2 -> TC_CHANNEL[0].TC_CV);
-        //printf("Value: %d\n\r", get_encoder_pos());
         
-        /*
-        if (time - last_time_print > 1000) {
-            
-            printf("Time in seconds: %d\n\r", time / 1000);
-            last_time_print = time;
-        }
-        */
 
-        // can_send makes control janky, maybe it takes alot of time
-        // can_send(&msg_tx, 0);
         int A = ADC_read();
-        //if (A < 1100) printf("IR value: %d\n\r", A);
         
-        if (goals > 0) {
+        if (IR_blocked > 0) {
 
             printf("Game over\n\r");
             set_enable_pwm_duty_ratio(0.00f);
@@ -195,7 +147,6 @@ int main()
             game_over = false;
 
             while (1) {
-                //set_enable_pwm_duty_ratio(0.0f);
                 control_loop_tick(0);
             }
         }
